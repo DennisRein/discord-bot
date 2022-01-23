@@ -1,5 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { SlashCommandBuilder, ChannelType } = require('@discordjs/builders');
+const { MessageActionRow, MessageSelectMenu, Constants } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,25 +9,37 @@ module.exports = {
             return channel // Add return here
                 .setName("channel")
                 .setDescription("In welchen Kanal möchtest du die Nachricht senden?")
-                .setRequired(true)  
-        }).addStringOption(option =>
-        option.setName("message")
-            .setDescription("Die zu sendende Nachricht:")
-            .setRequired(true)
-        ),
+                .setRequired(true)
+                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
+
+        }),
     async execute(interaction) {
 
-
-        let msg = interaction.options.get("message").value.replaceAll('\\n', '\n');
         let channelID = interaction.options.get("channel").value;
 
-		const channel = interaction.client.channels.cache.get(channelID);
-		if (channel) {
-				await channel.send(msg);
-                await interaction.reply({ content: `Die Nachricht wurde in den Channel: ${channel.name} geschrieben.`});
-            }
-		else {
-            await interaction.reply({ content: `Es ist etwas schief gegangen..`});
-		}
+        const channel = interaction.client.channels.cache.get(channelID);
+
+        let botMessage = "Antworte bitte auf diese Nachricht mit der Nachricht die du senden willst, du hast eine Minute Zeit: ";
+		await interaction.reply({ content: botMessage, fetchReply: true }).then(message => {
+  
+            const SECONDS_TO_REPLY = 60 // replace 60 with how long to wait for message(in seconds).
+            const MESSAGES_TO_COLLECT = 1
+            const filter = (m) => m.author.id == interaction.user.id
+            const collector = interaction.channel.createMessageCollector({filter, time: SECONDS_TO_REPLY * 1000, max: MESSAGES_TO_COLLECT})
+            collector.on('end', collected => {
+                if (collected.size <= 0) {
+                    interaction.deleteReply();
+                    
+                }
+            });
+            collector.on('collect', collected => {
+                channel.send(collected.content);
+                interaction.followUp(`Nachricht wurde in den channel: ${channel.name} gesendet.`);
+            })
+        });
+
+
+
+
     },
 };
