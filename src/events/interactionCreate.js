@@ -1,17 +1,14 @@
+
+
+
 module.exports = {
 	name: 'interactionCreate',
 	async execute(client, interaction) {
-        if (!interaction.isCommand()) return;
+        const commands = require("./interactions/commands.js");
+        const selection = require("./interactions/selection.js");
 
-        const command = client.commands.get(interaction.commandName);
-    
-        if (!command) return;
-    
-        try {
-            await command.execute(interaction);
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-        }
+        if(interaction.isCommand()) commands(client, interaction);
+
+        if(interaction.isSelectMenu()) selection(client, interaction);
 	},
 };
