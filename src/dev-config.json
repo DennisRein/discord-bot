@@ -1,23 +1,24 @@
 {
     "clientId": "934228939021381700",
     "guildId": "836616942298202162",
-    "welcomeChannel": "481794270441897984",
-    "botRole": "541051990697050132", 
+    "welcomeChannel": "934875927068954694",
+    "ruleChannel": "836616942298202165",
+    "modRole": "934876198624960512",
     "timeoutRole": "810197937031217273",
     "log": {
-        "channel": "489049941587787796"
+        "channel": "934876059860611142"
     },
     "rules": {
-        "channel": "810209766785679370",
+        "channel": "934614088540119080",
         "acceptMessage": "Der Igel sitzt in seinem Bau",
-        "baseRole": "604666501479399438"
+        "baseRole": "934614287647932457"
     },
     "reaction":
     [
     ]
     ,
     "voice": {
-        "role": "800173600069386241"
+        "role": "837507726962720798"
     },
     "urls": {}
 }
