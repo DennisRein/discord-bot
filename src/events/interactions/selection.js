@@ -17,12 +17,22 @@ module.exports = async function selection(client, interaction) {
 
 		let selectedRoles = interaction.values;
 
+		let embed = new MessageEmbed()
+			.setTitle("Die gewählten Rollen:")
+
+		let rolesObject = [];
+		let count = 1;
+		for (role of selectedRoles) {
+			let r = interaction.guild.roles.cache.get(role);
+			embed.addField(`Nr. ${count}`, r.name);
+			rolesObject.push(r);
+
+			count++;
+		}
 		let index = 0;
 		let map = {};
-
-		await interaction.reply({ content: `Reagiere auf diese Nachricht mit den zu den Rollen dazugehörigen Emote in der gegebenen Reihenfolge:`, 
-		embeds: [getRoleEmbed(interaction, selectedRoles)], fetchReply: true }).then(message => {
-			const filter = (user) => {
+		await interaction.reply({ content: `Reacte auf diese Nachricht mit den zu den Rollen dazugehörigen Emote in der gegebenen Reihenfolge:`, embeds: [embed], fetchReply: true }).then(message => {
+			const filter = (reaction, user) => {
 				return user.id === interaction.user.id;
 			};
 			message.awaitReactions({ filter, max: selectedRoles.length, time: 60000, errors: ['time'] })
@@ -31,7 +41,9 @@ module.exports = async function selection(client, interaction) {
 						map[reaction[0]] = rolesObject[index];
 						index++;
 					}
-					message.reply({ content: "Passt das so?", embeds: [getEmbed(channelObj, description ?? "Keine Beschreibung", map)], components: [getButtons()], fetchReply: true }).then(msg2 => {
+					let emb = getEmbed(channelObj, description ?? "Keine Beschreibung", map);
+					let buttons = getButtons();
+					message.reply({ content: "Passt das so?", embeds: [emb], components: [buttons], fetchReply: true }).then(msg2 => {
 						const collector = msg2.channel.createMessageComponentCollector({ time: 15000 });
 
 						collector.on('collect', async i => {
@@ -60,6 +72,7 @@ module.exports = async function selection(client, interaction) {
 
 						collector.on('end', collected => console.log(`Collected ${collected.size} items`));
 					})
+
 				})
 				.catch(collected => {
 					message.reply('Ein Fehler ist aufgetreten.');
@@ -68,28 +81,12 @@ module.exports = async function selection(client, interaction) {
 	}
 }
 
-function getRoleEmbed(interaction, selectedRoles) {
-	let embed = new MessageEmbed()
-			.setTitle("Die gewählten Rollen:")
-
-		let rolesObject = [];
-		let count = 1;
-		for (role of selectedRoles) {
-			let r = interaction.guild.roles.cache.get(role);
-			embed.addField(`Nr. ${count}`, r.name);
-			rolesObject.push(r);
-
-			count++;
-		}
-	return embed;
-}
-
 function getChannelMessage(reactionMap) {
 
 	let embed = new MessageEmbed().setTitle("Reagiere auf diese Nachricht mit den angezeigten Emotes um die dazugehörige Rolle zu erhalten!");
 
 	for (const [key, value] of Object.entries(reactionMap)) {
-			embed.addField(key, value.name)
+		embed.addField(key, value.name)
 	}
 
 	return embed;
@@ -98,14 +95,14 @@ function getChannelMessage(reactionMap) {
 function getEmbed(channel, description, reactionMap) {
 
 	let embed = new MessageEmbed()
-			.setTitle("Die Beschreibung kannst du Nachträglich mit dem /edit-message Befehl anpassen!")
-			.addFields(
-					{ name: channel.name, value: channel.id },
-					{ name: 'Description', value: description },
-			);
+		.setTitle("Die Beschreibung kannst du Nachträglich mit dem /edit-message Befehl anpassen!")
+		.addFields(
+			{ name: channel.name, value: channel.id },
+			{ name: 'Description', value: description },
+		);
 
 	for (const [key, value] of Object.entries(reactionMap)) {
-			embed.addField(key, value.name)
+		embed.addField(key, value.name)
 	}
 
 	return embed;
@@ -113,17 +110,17 @@ function getEmbed(channel, description, reactionMap) {
 
 function getButtons() {
 	const row = new MessageActionRow().addComponents(
-			new MessageButton()
-					.setCustomId('submit')
-					.setLabel('Passt')
-					.setStyle('PRIMARY'),
+		new MessageButton()
+			.setCustomId('submit')
+			.setLabel('Passt')
+			.setStyle('PRIMARY'),
 	)
-			.addComponents(
-					new MessageButton()
-							.setCustomId('abort')
-							.setLabel('Abbruch')
-							.setStyle('DANGER'),
-			);
+		.addComponents(
+			new MessageButton()
+				.setCustomId('abort')
+				.setLabel('Abbruch')
+				.setStyle('DANGER'),
+		);
 
 	return row;
 }

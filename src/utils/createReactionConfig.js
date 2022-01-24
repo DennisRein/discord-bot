@@ -1,4 +1,4 @@
-module.exports = async function writeEntry(entry) {
+module.exports = function writeEntry(entry) {
     var fs = require('fs');
     let path = "./src/reaction-config.json";
 
