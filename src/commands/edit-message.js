@@ -4,7 +4,7 @@ const { MessageActionRow, MessageSelectMenu, Constants } = require('discord.js')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('edit-message')
-        .setDescription('Edit a message send by the bot')
+        .setDescription('Verändere eine zuvor von diesem Bot gesendete Nachricht')
         .addChannelOption(channel => {
             return channel // Add return here
                 .setName("channel")
@@ -46,24 +46,3 @@ module.exports = {
 
     },
 };
-
-function getChannels(interaction) {
-    var array = [];
-    let channels = interaction.client.channels;
-
-    for (const channel of channels.cache) {
-        let chan = channel[1];
-        if(!(chan.type === "GUILD_CATEGORY")) {
-            let id = chan.id;
-            let name = chan.name;
-            let option = {
-                label: name,
-                description: id,
-                value: id
-            }
-            array.push(option);
-        }
-    }
-
-    return array;
-}

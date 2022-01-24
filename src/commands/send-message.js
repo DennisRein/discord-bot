@@ -4,7 +4,7 @@ const { MessageActionRow, MessageSelectMenu, Constants } = require('discord.js')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('send-message')
-        .setDescription('Write a message as the bot')
+        .setDescription('Lass den Bot eine Nachricht senden')
         .addChannelOption(channel => {
             return channel // Add return here
                 .setName("channel")
