@@ -60,6 +60,7 @@ module.exports = async function selection(client, interaction) {
 									client.rr.teardown();
 								}
 								client.rr = new ReactionRole(client, conf);
+								await i.update({ content: 'Ich erstelle die Nachricht!', components: [] });
 								 
 							}
 							if (i.customId === 'abort') {
