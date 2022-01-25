@@ -93,7 +93,6 @@ module.exports = {
         else if(user) {
 
             interaction.reply("Nur User wird noch nichts supportet.");
-            console.log(user);
         }
         let buttons = getButtons();
         interaction.reply({ content: `Sollen wirklich ${messageIDs.length} Nachrichten gelöscht werden?`, components: [buttons], fetchReply: true }).then(msg2 => {

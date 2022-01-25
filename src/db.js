@@ -39,17 +39,15 @@ module.exports = class DB {
             username: Sequelize.STRING,
             joined: Sequelize.DATE,
             lastmessage: Sequelize.DATE,
-            hasrole: Sequelize.BOOLEAN,
+            hasrole: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false
+            },
             activity: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0,
                 allowNull: false,
-            },
-            level: {
-                type: Sequelize.INTEGER,
-                defaultValue: 0,
-                allowNull: false,
-            },
+            }
         });
     }
 

@@ -71,8 +71,7 @@ module.exports = async function selection(client, interaction) {
 							}
 						});
 
-						collector.on('end', collected => console.log(`Collected ${collected.size} items`));
-					})
+						})
 
 				})
 				.catch(collected => {
