@@ -1,50 +1,13 @@
-das in datenbank???
-
 {
-    "clientId": "<clientID>",
-    "guildId": "<Main Guild ID>",
-    "welcomeChannel": "<Channel ID tbd.>",
-    "botRole": "<Bot Role ID (depr.)?>",
-    "timeoutRole": "<Time Out Role ID (depr.)?>",
-    "log": {
-        "channel": "<ID of log channel>"
-    },
+    "clientId": "<Autofilled by Bot on setup>",
+    "guildId": "<Autofilled by Bot on setup>",
+    "welcomeChannel": "<Set channel for welcome message on setup>",
+    "modRole": "<Set the role which has full access over the bot on setup>",
+    "voiceRole": "<Set the role which get on joining voice on setup>",
+    "logChannel": "<Set channel for log messages on setup>",
     "rules": {
-        "channel": "<ID of rule channel>",
-        "acceptMessage": "<Accept message>",
-        "baseRole": "<FAULTIER ID?>"
-    },
-    "reaction": 
-        [
-            {
-                "name": "<NAME DER REACTION>",
-                "channel": "<MESSAGE CHANNEL ID>",
-                "messageID": "<MESSAGE ID>",
-                "reactions": [
-                    {
-                        "guildEmoji": false,
-                        "reaction": "🎲",
-                        "role": "765622777042436177",
-                        "duration": 0
-                    },
-                    {
-                        "guildEmoji": false,
-                        "reaction": "🎨",
-                        "role": "765622851238887425",
-                        "duration": 0
-                    },
-                    {
-                        "guildEmoji": false,
-                        "reaction": "📚",
-                        "role": "765622882541633557",
-                        "duration": 0
-                    }
-                ]
-            }
-        ]
-    ,
-    "voice": {
-        "role": "<Role ID while in Voice>"
-    },
-    "urls": {}
+        "channel": "<Set channel where baseRole is given on acceptMessage on setup>",
+        "acceptMessage": "<Message in channel to gain base role>",
+        "baseRole": "<Set the role which has ful access over the bot on setup>"
+    }
 }
