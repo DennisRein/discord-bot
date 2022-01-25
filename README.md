@@ -1,2 +1,2 @@
-# discord-obt
+# discord-bot
 Discord Bot managing the Igelbau Server
