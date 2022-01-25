@@ -20,6 +20,7 @@ module.exports = class DB {
     initiateModels() {
         this.createUserModel();
         this.createAutomaticMessageModel();
+        this.createWunschbrunnenModel();
     }
 
     get userModel() {
@@ -28,6 +29,29 @@ module.exports = class DB {
 
     get autoMessageModel() {
         return this.automaticMessage;
+    }
+
+    get wunschbrunnenModel() {
+        return this.wunschbrunnen;
+    }
+
+    createWunschbrunnenModel() {
+        this.wunschbrunnen = this.sequelize.define('wunschbrunnen', {
+            id: {
+                type: Sequelize.INTEGER,
+                autoIncrement: true,
+                primaryKey: true
+            },
+            userid: {
+                type: Sequelize.STRING
+            },
+            message: Sequelize.STRING,
+            sent: Sequelize.DATE,
+            replied: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false
+            }
+        });
     }
 
     createUserModel() {
@@ -73,5 +97,6 @@ module.exports = class DB {
     sync() {
         this.automaticMessage.sync();
         this.users.sync();
+        this.wunschbrunnen.sync();
     }
 }
