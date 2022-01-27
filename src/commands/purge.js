@@ -23,6 +23,7 @@ module.exports = {
                 .setName('amount')
                 .setDescription('Anzahl an zu entfernenden Nachrichten. Leer lassen um ALLE betroffenen Nachrichten zu entfernen.')),
     async execute(interaction) {
+        const writeLogMessage = require("../utils/writeLogMessage.js");
         const channelID = interaction.options.get("channel") ?? null;
         const userID = interaction.options.get("user") ?? null;
 
@@ -100,6 +101,7 @@ module.exports = {
 
             collector.on('collect', async i => {
                 if (i.customId === 'submit') {
+                    writeLogMessage({client: interaction.client, type: "purge", args: user, channel, messageIDs, interaction})
                     channel.bulkDelete(messageIDs);
                     await i.update({ content: `Es wurden ${messageIDs.length} Nachrichten gelöscht.`, components: [] });
                         
