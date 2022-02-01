@@ -1,10 +1,9 @@
 const { MessageEmbed } = require('discord.js');
 
 
-module.exports = function writeLogMessage({client, type, ...args}) {
+module.exports = async function writeLogMessage({client, type, ...args}) {
     
     const { logChannel, clientId } = require('../dev-config.json');
-
 
     const channel = client.channels.cache.get(logChannel);
     switch(type) {
@@ -17,10 +16,12 @@ module.exports = function writeLogMessage({client, type, ...args}) {
 
         }
         case "messageDelete": {
+
+            console.log(args);
+            if(!args.args.author) return;
             if(args.args.author.id === clientId) return;
-            if(!args.args.message) return;
-            if(!args.args.message.editedTimestamp) return;
-            return channel.send({embeds: [getMessageDeletedEmbed(client, args.args)]})
+            if(!args.args.content) return;
+            return channel.send({embeds: [await getMessageDeletedEmbed(client, args.args)]})
         }
         case "guildMemberUpdate": {
             return channel.send({embeds: [getRoleChangedEmbed(args)]})
@@ -40,21 +41,25 @@ module.exports = function writeLogMessage({client, type, ...args}) {
 }
 
 function getTimeoutedEmbed(args) {
+    var moment = require('moment'); // require
+
     let timeA = args.entry.changes[0].old;
     let timeB = args.entry.changes[0].new;
 
-    let diff = moment.utc(moment(timeA,"DD/MM/YYYY HH:mm:ss").diff(moment(timeB,"DD/MM/YYYY HH:mm:ss"))).format("DD/MM/YYYY HH:mm:ss")
+    console.log(args.entry.changes);
+
+    let diff = moment.utc(moment(timeA,"YYYY/MM/DD HH:mm:ss").diff(moment(timeB,"YYYY/MM/DD HH:mm:s"))).format("DD/MM/YYYY HH:mm:ss")
 
     console.log(diff);
     return new MessageEmbed()
         .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> wurde von ${args.entry.executor.username} <${args.entry.executor.username}> getimeouted.`)
-        .addFields(
+        /*.addFields(
                 { name: "Timeout bis:", value: diff }
-        );
+        );*/
 }
 
 function getPurgedEmbed(args) {
-    let user = args.args.user;
+    let user = args.args?.user;
     let channel = args.channel;
     let amount = args.messageIDs.length;
     let sender = args.interaction.user;
@@ -99,16 +104,23 @@ function getMessageEditedEmbed(client, args) {
 }
 
 
-function getMessageDeletedEmbed(client, message) {    
+async function getMessageDeletedEmbed(client, message) {    
     const channelName = client.channels.cache.get(message.channelId).name;
+    const embed = new MessageEmbed()
+    .setTitle(`Es wurde eine Nachricht von ${message.author.username} <${message.author.discriminator}> gelöscht`)
+    .addFields(
+            { name: 'Channel:', value: channelName },
+            { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
+    );
+    const entry = await message.guild.fetchAuditLogs().then(audit => audit.entries.first())
+    console.log(entry); 
+    if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE') {
+        embed.addField("Gelöscht von:", `${entry.executor.username} <${entry.executor.discriminator}>`)
+    }
 
-    return new MessageEmbed()
-        .setTitle(`${message.author.username} <${message.author.discriminator}> hat eine Nachricht gelöscht`)
-        .addFields(
-                { name: 'Channel:', value: channelName },
-                { name: 'Zeitpunkt:', value: new Date(message.editedTimestamp).toISOString()},
-                { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
-        );
+    return embed;
+
+
 }
 
 function getRoleChangedEmbed(args) {
