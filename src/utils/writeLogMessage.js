@@ -40,7 +40,6 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
 
         }
         case "userBanned": {
-            console.log("args", args);
             return channel.send({embeds: [getTimeoutedEmbed(args, "gebannt")]})
 
         }
@@ -74,7 +73,6 @@ function getPurgedEmbed(args) {
 }
 
 function getMemberEmbed(member) {
-    console.log(member);
     return new MessageEmbed()
         .setTitle("Ein neuer User ist beigetreten:")
         .addFields(
@@ -108,7 +106,6 @@ async function getMessageDeletedEmbed(client, message) {
             { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
     );
     const entry = await message.guild.fetchAuditLogs().then(audit => audit.entries.first())
-    console.log(entry); 
     if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE') {
         embed.addField("Gelöscht von:", `${entry.executor.username} <${entry.executor.discriminator}>`)
     }

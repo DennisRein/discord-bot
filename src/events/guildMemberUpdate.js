@@ -4,15 +4,12 @@ module.exports = {
         const writeLogMessage = require("../utils/writeLogMessage.js");
 
         const entry = await newMember.guild.fetchAuditLogs().then(audit => audit.entries.first())
-        console.log(entry);
         if(entry.actionType === 'UPDATE' && entry.changes[0].key === 'communication_disabled_until' && entry.target.id === oldMember.user.id) {
             writeLogMessage({ client: client, type: "userTimeouted", args: newMember, entry })
 
             return;
         }
         
-        console.log(entry);
-
         let roles = [];
         let added = false;
         if(oldMember.nickname !== newMember.nickname) return writeLogMessage({client: client, type: "nicknameChanged", args: oldMember, newMember});
