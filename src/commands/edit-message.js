@@ -23,7 +23,7 @@ module.exports = {
         let messageID = interaction.options.get("messageid").value;
 
 		const channel = await interaction.client.channels.fetch(channelID);
-        const msg = await channel.messages.fetch(messageID);
+        const msg = await interaction.client.messageHelper.fetchMessageById(messageID, channel);// channel.messages.fetch(messageID);
 
         let botMessage = "Antworte bitte auf diese Nachricht mit der Nachricht die du senden willst, du hast eine Minute Zeit: ";
 		await interaction.reply({ content: botMessage, fetchReply: true }).then(message => {

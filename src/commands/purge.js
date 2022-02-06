@@ -51,14 +51,12 @@ module.exports = {
         let messageIDs = [];
 
         if (channel && user) {
-            let messages = await channel.messages.fetch();
-
-            messages = messages.filter(m => m.author.id === user.id);
+            let messages = await interaction.client.messageHelper.fetchAllForUserInChannel(channel);
 
 
             if (a < 0) {
                 for (let message of messages) {
-                    messageIDs.push(message[0]);
+                    messageIDs.push(message.dataValues.id);
                 }
             }
             else {
@@ -66,18 +64,17 @@ module.exports = {
                 let i = 0;
                 if (a > messages.size) a = messages.size;
                 for (let message of messages) {
-                    messageIDs.push(message[0]);
+                    messageIDs.push(message.dataValues.id);
                     i++;
                     if (i == a) break;
                 }
             }
         }
         else if (channel) {
-            let messages = await channel.messages.fetch();
-
+            let messages = await interaction.client.messageHelper.fetchChannelMessage(channel);
             if (a < 0) {
                 for (let message of messages) {
-                    messageIDs.push(message[0]);
+                    messageIDs.push(message.dataValues.id);
                 }
             }
             else {
@@ -85,7 +82,7 @@ module.exports = {
                 let i = 0;
                 if (a > messages.size) a = messages.size;
                 for (let message of messages) {
-                    messageIDs.push(message[0]);
+                    messageIDs.push(message.dataValues.id);
                     i++;
                     if (i == a) break;
                 }

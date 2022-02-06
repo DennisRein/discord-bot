@@ -11,13 +11,11 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             return channel.send({embeds: [getMemberEmbed(args.args)]});
         }
         case "messageUpdate": {
+            if(!args.args.author) return;
             if(args.args.author.id === clientId) return;
             return channel.send({embeds: [getMessageEditedEmbed(client, args)]})
-
         }
         case "messageDelete": {
-
-            console.log(args);
             if(!args.args.author) return;
             if(args.args.author.id === clientId) return;
             if(!args.args.content) return;
@@ -35,27 +33,22 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
         }
         case "userTimeouted": {
             //newMember, entry
-            return channel.send({embeds: [getTimeoutedEmbed(args)]})
+            return channel.send({embeds: [getTimeoutedEmbed(args, "getimeouted")]})
+        }
+        case "userKicked": {
+            return channel.send({embeds: [getTimeoutedEmbed(args, "gekickt")]})
+
+        }
+        case "userBanned": {
+            return channel.send({embeds: [getTimeoutedEmbed(args, "gebannt")]})
+
         }
     }
 }
 
-function getTimeoutedEmbed(args) {
-    var moment = require('moment'); // require
-
-    let timeA = args.entry.changes[0].old;
-    let timeB = args.entry.changes[0].new;
-
-    console.log(args.entry.changes);
-
-    let diff = moment.utc(moment(timeA,"YYYY/MM/DD HH:mm:ss").diff(moment(timeB,"YYYY/MM/DD HH:mm:s"))).format("DD/MM/YYYY HH:mm:ss")
-
-    console.log(diff);
+function getTimeoutedEmbed(args, type) {
     return new MessageEmbed()
-        .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> wurde von ${args.entry.executor.username} <${args.entry.executor.username}> getimeouted.`)
-        /*.addFields(
-                { name: "Timeout bis:", value: diff }
-        );*/
+        .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> wurde von ${args.entry.executor.username} <${args.entry.executor.discriminator}> ${type}.`)
 }
 
 function getPurgedEmbed(args) {
@@ -84,7 +77,7 @@ function getMemberEmbed(member) {
         .setTitle("Ein neuer User ist beigetreten:")
         .addFields(
                 { name: "Name", value: member.user.username + `<${member.user.discriminator}>` },
-                { name: 'Beigetreten:', value: new Date(member).toISOString() },
+                { name: 'Beigetreten:', value: new Date(member.joinedTimestamp).toISOString() },
         );
 }
 
@@ -113,7 +106,6 @@ async function getMessageDeletedEmbed(client, message) {
             { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
     );
     const entry = await message.guild.fetchAuditLogs().then(audit => audit.entries.first())
-    console.log(entry); 
     if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE') {
         embed.addField("Gelöscht von:", `${entry.executor.username} <${entry.executor.discriminator}>`)
     }
