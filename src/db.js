@@ -102,8 +102,7 @@ module.exports = class DB {
     createMessageModel() {
         this.messages = this.sequelize.define('messages', {
             id: {
-                type: Sequelize.INTEGER,
-                autoIncrement: true,
+                type: Sequelize.STRING,
                 primaryKey: true
             },
             channel: {

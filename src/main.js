@@ -9,10 +9,13 @@ const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_M
     partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'GUILD_MEMBER']});
 
 const DB = require('./db.js');
+const MessageHelper = require('./utils/messageHelper.js');
 
 client.db = new DB();
 
 client.db.init();
+
+client.messageHelper = new MessageHelper(client);
 
 try {
 	const { d } = require("./reaction-config.json");

@@ -8,6 +8,17 @@ module.exports = {
         if(message.author.id === client.user.id)
             return;
 
+        if(message.guildId) {
+            client.db.messages.create({
+                id: message.id,
+                sender: message.author.id,
+                message: message.content,
+                channel: message.channelId,
+                timestamp: Date.now()
+                
+            });
+        }
+
         if(!message.guildId ) {
             const { guildId, wunschBrunnenChannel } = require('../dev-config.json');
             let buttons = getButtons();
