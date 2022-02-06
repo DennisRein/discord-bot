@@ -43,12 +43,23 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             return channel.send({embeds: [getTimeoutedEmbed(args, "gebannt")]})
 
         }
+        case "botDetected": {
+            return channel.send({embeds: [getBotEmbed(args)]})
+
+        }
     }
 }
+function getBotEmbed(args) {
+    return new MessageEmbed()
+        .setTitle(`${args.message.author.username} <${args.message.author.discriminator}> wurde von mir gekickt.`)
+        .addField("Grund", "Verdacht auf Bot")
+        .addField("Nachricht", args.message.content)
+    }
 
 function getTimeoutedEmbed(args, type) {
     return new MessageEmbed()
         .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> wurde von ${args.entry.executor.username} <${args.entry.executor.discriminator}> ${type}.`)
+
 }
 
 function getPurgedEmbed(args) {

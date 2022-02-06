@@ -25,4 +25,12 @@ module.exports = class MessageHelper {
         return await this.client.db.messagesModel.findAll({where: {sender: userId}})
     }
 
+    async fetchLastMessagesByUserInInterval(userId, interval) {
+        var Sequelize = require('sequelize');
+        const Op = Sequelize.Op;
+        return await this.client.db.messagesModel.findAll({where: {sender: userId, createdAt: {
+            [Op.gt]: new Date(Date.now() - (interval * 1000)),
+        }}})
+    }
+
 }

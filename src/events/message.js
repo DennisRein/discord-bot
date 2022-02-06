@@ -3,7 +3,7 @@ const { MessageActionRow, MessageButton } = require('discord.js');
 module.exports = {
 	name: 'messageCreate',
 	async execute(client, message) {
-        var moment = require('moment'); // require
+        var moment = require('moment');
 
         if(message.author.id === client.user.id)
             return;
@@ -17,6 +17,8 @@ module.exports = {
                 timestamp: Date.now()
                 
             });
+
+            botTest(client, message);
         }
 
         if(!message.guildId ) {
@@ -78,6 +80,67 @@ module.exports = {
         }
 	},
 };
+
+
+async function botTest(client, message) {
+    const writeLogMessage = require("../utils/writeLogMessage.js");
+
+
+    var moment = require('moment'); // require
+    let msgs = await client.messageHelper.fetchLastMessagesByUserInInterval(message.author.id, 10);
+
+    let threshold = 3; 
+    let channels = {};
+    let equalMessages = {};
+    let messageIds = [];
+
+
+    for(msg of msgs) {
+        messageIds.push(msg.id);
+        if(msg.channel in channels) {
+            channels[msg.channel] = channels[msg.channel] + 1;
+        }
+        else {
+            channels[msg.channel] = 1;
+        }
+        if(msg.message in equalMessages) {
+            equalMessages[msg.message] = equalMessages[msg.message] + 1;
+        }
+        else {
+            equalMessages[msg.message] = 1;
+        }
+    }
+    if(equalMessages[msg.message] > threshold && Object.keys(channels).length > threshold) {
+        writeLogMessage({client: client, type: "botDetected", args: msgs, message});
+
+        console.log("Kick");
+        let member = fetchMember(client, message);
+        for(let msg of msgs) {
+            deleteMessage(client, msg.channel, msg.id);
+        }
+        if(!member.kickable) return console.log("I cannot kick this member!");
+        member.kick();
+    }
+    return;
+
+    if(!user.hasrole && user.activity >= 15000) {
+        fetchMember(client, message).roles.add(activityRole);
+        await client.db.userModel.update({ hasrole: 1 }, { where: { id: user.id } });
+    }
+
+    var newDate = moment(user.lastmessage).add(1, 'm').toDate();
+    if(Date.now() >= newDate) {
+        let xp = 15 + (message.content.length > 2000 ? 35 : Math.floor(message.content.length * 0,0175));
+        await client.db.userModel.update({ lastmessage: Date.now(), activity: user.activity + xp  }, { where: { id: user.id } });
+    }
+
+}
+
+async function deleteMessage(client, channelId, messageId) {
+    let channel = await client.channels.fetch(channelId);
+    let message = await channel.messages.fetch(messageId);
+    message.delete();
+}
 
 async function fetchUserModel(client, message) {
 
