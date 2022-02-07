@@ -47,8 +47,16 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             return channel.send({embeds: [getBotEmbed(args)]})
 
         }
+        case "inactivePurge": {
+            return channel.send({embeds: [getInactivePurgedEmbed(args)]})
+        }
     }
 }
+function getInactivePurgedEmbed(args) {
+    return new MessageEmbed()
+        .setTitle(`Ich hätte ${args.args} Benutzer vom Server entfernt die nach zwei Wochen keine Rolle erhalten haben. Die Kickfunktion ist jedoch noch temporär deaktiviert um die Entdeckte Anzahl zu prüfen.`)
+    }
+
 function getBotEmbed(args) {
     return new MessageEmbed()
         .setTitle(`${args.message.author.username} <${args.message.author.discriminator}> wurde von mir gekickt.`)

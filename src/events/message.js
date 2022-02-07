@@ -113,7 +113,6 @@ async function botTest(client, message) {
     if(equalMessages[msg.message] > threshold && Object.keys(channels).length > threshold) {
         writeLogMessage({client: client, type: "botDetected", args: msgs, message});
 
-        console.log("Kick");
         let member = fetchMember(client, message);
         for(let msg of msgs) {
             deleteMessage(client, msg.channel, msg.id);
