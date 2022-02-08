@@ -11,6 +11,10 @@ module.exports = {
                 .setRequired(true)
         ),
     async execute(interaction) {
+        if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
         
         const { guildId, wunschBrunnenChannel } = require('../dev-config.json');
 

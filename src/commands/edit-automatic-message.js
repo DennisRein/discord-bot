@@ -11,6 +11,10 @@ module.exports = {
                 .setRequired(true)
                 .setDescription('Die ID der zu entfernenden Nachricht: /show-automatic-messages')),
     async execute(interaction) {
+        if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
         let id = interaction.options.get("id").value;
 
         let botMessage = "Antworte bitte auf diese Nachricht mit der veränderten Nachricht die du senden willst, du hast eine Minute Zeit: ";

@@ -23,6 +23,10 @@ module.exports = {
                 .setName('amount')
                 .setDescription('Anzahl an zu entfernenden Nachrichten. Leer lassen um ALLE betroffenen Nachrichten zu entfernen.')),
     async execute(interaction) {
+        if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
         const writeLogMessage = require("../utils/writeLogMessage.js");
         const channelID = interaction.options.get("channel") ?? null;
         const userID = interaction.options.get("user") ?? null;

@@ -18,6 +18,10 @@ module.exports = {
                 .setRequired(true)
             ),
     async execute(interaction) {
+        if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
         let channelID = interaction.options.get("channel").value;
 
         let messageID = interaction.options.get("messageid").value;

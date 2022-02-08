@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, Intents, Permissions } = require('discord.js');
 const { default: ReactionRole } = require("discordjs-reaction-role");
 const dotenv = require('dotenv');
 
@@ -16,6 +16,10 @@ client.db = new DB();
 client.db.init();
 
 client.messageHelper = new MessageHelper(client);
+
+client.memberHasPermission = function(member) {
+	return member.permissions.has(Permissions.FLAGS.KICK_MEMBERS)
+}
 
 try {
 	const { d } = require("./reaction-config.json");

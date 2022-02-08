@@ -19,9 +19,13 @@ module.exports = {
                 .setDescription('Alle wieviel Minuten soll die Nachricht gesendet werden?')),
     async execute(interaction) {
 
+		if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
         let channelID = interaction.options.get("channel").value;
         let interval = interaction.options.get("interval").value;
-        const channel = interaction.client.channels.fetch(channelID);
+        const channel = await interaction.client.channels.fetch(channelID);
 
         let botMessage = "Antworte bitte auf diese Nachricht mit der Nachricht die du senden willst, du hast eine Minute Zeit: ";
 		await interaction.reply({ content: botMessage, fetchReply: true }).then(message => {

@@ -19,7 +19,10 @@ module.exports = {
                 .setRequired(false)
         ),
     async execute(interaction) {
-
+		if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
         const channelID = interaction.options.get("channel").value;
 
         const channel = await interaction.client.channels.fetch(channelID);

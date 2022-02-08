@@ -6,6 +6,10 @@ module.exports = {
         .setName('show-automatic-messages')
         .setDescription('Zeige alle automatischen Nachrichten an!'),
     async execute(interaction) {
+        if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
         const messageList = await interaction.client.db.autoMessageModel.findAll();
         let embed = new MessageEmbed()
             .setTitle("Sehe hier die aktiven Nachrichten")
