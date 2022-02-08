@@ -50,8 +50,18 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
         case "inactivePurge": {
             return channel.send({embeds: [getInactivePurgedEmbed(args)]})
         }
+        case "userLeft": {
+            return channel.send({embeds: [getUserLeftEmbed(args)]})
+
+        }
     }
 }
+
+function getUserLeftEmbed(args) {
+    return new MessageEmbed()
+        .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Server verlassen`)
+    }
+
 function getInactivePurgedEmbed(args) {
     return new MessageEmbed()
         .setTitle(`Ich hätte ${args.args} Benutzer vom Server entfernt die nach zwei Wochen keine Rolle erhalten haben. Die Kickfunktion ist jedoch noch temporär deaktiviert um die Entdeckte Anzahl zu prüfen.`)

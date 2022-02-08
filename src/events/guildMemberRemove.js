@@ -18,6 +18,9 @@ module.exports = {
             return;
         }
 
+
+        writeLogMessage({ client: client, type: "userLeft", args: member })
+
     }
         
 };
