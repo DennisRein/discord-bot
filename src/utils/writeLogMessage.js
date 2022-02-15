@@ -147,7 +147,7 @@ async function getMessageDeletedEmbed(client, message) {
 function getRoleChangedEmbed(args) {
     let user = args.newMember.user;
     return new MessageEmbed()
-    .setTitle(`${user.username} <${user.discriminator}> eine Rolle wurde ${args.args ? "hinzugefügt " : "entfernt "}.`)
+    .setTitle(`${user.username} <${user.discriminator}> eine Rolle wurde ${args.args ? "hinzugefügt" : "entfernt"}.`)
     .addFields(
             { name: 'Rolle:', value: args.roles[0].name },
     );

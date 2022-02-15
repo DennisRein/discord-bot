@@ -50,6 +50,8 @@ module.exports = {
 function startInterval(client) {
 	var moment = require('moment'); // require
 
+	const { guildId } = require('../dev-config.json');
+
 	return interval = setInterval(function () {
 		client.db.autoMessageModel.findAll().then((messageList) => {
 			for (let message of messageList) {
@@ -63,6 +65,28 @@ function startInterval(client) {
 					client.db.autoMessageModel.update({ lastsend: now }, { where: { id: msg.id } });
 
 					channel.send(msg.message);
+				}
+			}
+		})
+		client.db.timedRolesModel.findAll().then(async (entries) => {
+			for (let entry of entries) {
+				let e = entry.dataValues;
+				let now = Date.now();
+				let roleid = e.roleid;
+				let messageid = e.messageid;
+				let userid = e.userid;
+				let channelid = e.channelid;
+				let reaction = e.reactionid;
+
+				let guild = await client.guilds.fetch(guildId)
+				let member = await guild.members.fetch(userid);
+				let channel = await guild.channels.fetch(channelid);
+				let message = await channel.messages.fetch(messageid);
+				
+				if (now >= e.loseroleafter) {
+					message.reactions.resolve(reaction).users.remove(userid);
+					member.roles.remove(roleid);
+					client.db.timedRolesModel.destroy({ where: { userid: userid } });	
 				}
 			}
 		})

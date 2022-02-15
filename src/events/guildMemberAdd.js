@@ -3,7 +3,7 @@
 module.exports = {
 	name: 'guildMemberAdd',
 	async execute(client, member) {
-        const { welcomeChannel, ruleChannel } = require('../dev-config.json');
+        const { welcomeChannel, ruleChannel, welcomeMessage } = require('../dev-config.json');
         
         const writeLogMessage = require("../utils/writeLogMessage.js");
         

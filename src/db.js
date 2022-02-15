@@ -22,6 +22,7 @@ module.exports = class DB {
         this.createAutomaticMessageModel();
         this.createWunschbrunnenModel();
         this.createMessageModel();
+        this.createTimedRolesModel();
     }
 
     get userModel() {
@@ -38,6 +39,10 @@ module.exports = class DB {
 
     get messagesModel() {
         return this.messages;
+    }
+
+    get timedRolesModel() {
+        return this.timedRoles;
     }
 
     createWunschbrunnenModel() {
@@ -114,10 +119,28 @@ module.exports = class DB {
         });
     }
 
+    createTimedRolesModel() {
+        this.timedRoles = this.sequelize.define('timedroles', {
+            userid: {
+                type: Sequelize.STRING,
+                unique: true,
+            },
+            reactionid: {
+                type: Sequelize.STRING,
+            },
+            channelid: Sequelize.STRING,
+            loseroleafter: Sequelize.DATE,
+            messageid: Sequelize.STRING,
+            roleid: Sequelize.STRING
+            
+        });
+    }
+
     sync() {
         this.automaticMessage.sync();
         this.users.sync();
         this.wunschbrunnen.sync();
         this.messages.sync();
+        this.timedRoles.sync();
     }
 }
