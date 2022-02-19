@@ -54,7 +54,10 @@ module.exports = {
 
             return;
         }
-
+        if(!client.configExists()) {
+            console.log('Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!');	
+            return; 
+        }
         const { rules, activityRole } = client.config;
 
         if(rules.channel === message.channelId) {

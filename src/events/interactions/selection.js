@@ -247,16 +247,32 @@ module.exports = async function selection(client, interaction) {
 		
 		let selectedChannel = interaction.values[0];
 		interaction.client.config.wunschBrunnenChannel = selectedChannel;
-		const channelRow = new MessageActionRow()
-		.addComponents(
-			new MessageSelectMenu()
-				.setCustomId('liveChannel-selection')
-				.setPlaceholder('Live Channel?')
-				.addOptions(getChannels(interaction))
-		);
-
-		await interaction.reply({ content: `In welchen Channel schreibe ich die Benachrichtigung, dass Honeyball live ist?`, components: [channelRow]});
-		return;
+		await interaction.reply({ content: "Mit welcher Willkommensnachricht soll ich neue Member grüßen? Benutze \"{0}\" als Platzhalter für den Nutzernamen und \"{1}\" als Platzhalter für den Regelchannel:", fetchReply: true }).then(message => {
+  
+            const SECONDS_TO_REPLY = 60 // replace 60 with how long to wait for message(in seconds).
+            const MESSAGES_TO_COLLECT = 1
+            const filter = (m) => m.author.id == interaction.user.id
+            const collector = interaction.channel.createMessageCollector({filter, time: SECONDS_TO_REPLY * 1000, max: MESSAGES_TO_COLLECT})
+            collector.on('end', collected => {
+                if (collected.size <= 0) {
+                    interaction.deleteReply();
+                    
+                }
+            });
+            collector.on('collect', async collected => {
+				interaction.client.config.welcomeMessage = collected.content;
+				const channelRow = new MessageActionRow()
+				.addComponents(
+					new MessageSelectMenu()
+						.setCustomId('liveChannel-selection')
+						.setPlaceholder('Live Channel?')
+						.addOptions(getChannels(interaction))
+				);
+		
+				await interaction.followUp({ content: `In welchen Channel schreibe ich die Benachrichtigung, dass Honeyball live ist?`, components: [channelRow]});
+		
+			})
+		})
 	}
 
 	if (interaction.customId === 'liveChannel-selection') {
