@@ -56,7 +56,7 @@ async function startInterval(client) {
 	var moment = require('moment'); // require
 	const { MessageEmbed } = require('discord.js');
 
-	const { guildId, twitchNotificationChannel } = client.config;
+	const { guildId, twitchNotificationChannel, twitchLiveMessage } = client.config;
 	let guild = await client.guilds.fetch(guildId); 
 	let channel = await guild.channels.fetch(twitchNotificationChannel);
 	let liveFlag = false;
@@ -78,7 +78,7 @@ async function startInterval(client) {
 				)
 				.setImage(stream.thumbnail)
 				.setTimestamp()		
-				channel.send({ content: "@everyone Honeyball ist live", embeds: [twitchEmbed] });
+				channel.send({ content: twitchLiveMessage, embeds: [twitchEmbed] });
 			}
 			else if(liveFlag && !stream) {
 				liveFlag = false;
