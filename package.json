@@ -1,0 +1,47 @@
+{
+  "name": "mogel-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.js",
+  "dependencies": {
+    "@discordjs/builders": "^0.11.0",
+    "@discordjs/rest": "^0.2.0-canary.0",
+    "@twurple/api": "^5.0.17",
+    "@twurple/auth": "^5.0.17",
+    "@twurple/eventsub": "^5.0.17",
+    "bufferutil": "^4.0.6",
+    "discord-api-types": "^0.26.1",
+    "discord.js": "^13.6.0",
+    "discordjs-reaction-role": "^2.1.1",
+    "dotenv": "^8.6.0",
+    "erlpack": "^0.1.3",
+    "express": "^4.17.2",
+    "i18next": "^20.6.1",
+    "i18next-fs-backend": "^1.1.4",
+    "libsodium-wrappers": "^0.7.9",
+    "moment": "^2.29.1",
+    "node-addon-api": "^3.2.1",
+    "node-fetch": "^2.6.7",
+    "node-schedule": "^2.1.0",
+    "pg": "^8.7.1",
+    "sequelize": "^6.14.1",
+    "sqlite3": "^5.0.2",
+    "utf-8-validate": "^5.0.8",
+    "winston": "^3.4.0",
+    "zlib-sync": "^0.1.7"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy-commands": "node src/deploy-commands.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DennisRein/mogel-bot.git"
+  },
+  "author": "Dennis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DennisRein/mogel-bot/issues"
+  },
+  "homepage": "https://github.com/DennisRein/mogel-bot#readme"
+}

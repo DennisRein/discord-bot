@@ -1,0 +1,4 @@
+{
+    "onWelcomeResponse": "{{user}} welcome!",
+    "onCountUserAmount": "User count:"
+}
