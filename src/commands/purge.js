@@ -79,12 +79,14 @@ module.exports = {
                     if (i == a) break;
                 }
             }
+
         }
         else if (channel) {
-            let messages = await interaction.client.messageHelper.fetchChannelMessage(channel);
+            let messages = await channel.messages.fetch();
+
             if (a < 0) {
                 for (let message of messages) {
-                    messageIDs.push(message.dataValues.id);
+                    messageIDs.push(message[0]);
                 }
             }
             else {
@@ -92,7 +94,7 @@ module.exports = {
                 let i = 0;
                 if (a > messages.size) a = messages.size;
                 for (let message of messages) {
-                    messageIDs.push(message.dataValues.id);
+                    messageIDs.push(message[0]);
                     i++;
                     if (i == a) break;
                 }
