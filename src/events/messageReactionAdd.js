@@ -20,7 +20,6 @@ module.exports = {
         
 
                         const msg = d.find(element => element.messageId === reaction.message.id);
-                        console.log(msg);
                         if(!msg || msg.timed === 'Nie') {
                                 return;
                         }
@@ -47,7 +46,7 @@ module.exports = {
 
 
                 } catch (exception) {
-                        console.log(exception);
+                        //console.log(exception);
                 }
 
         }
