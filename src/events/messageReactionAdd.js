@@ -1,6 +1,10 @@
 module.exports = {
         name: 'messageReactionAdd',
         async execute(client, reaction, user) {
+                if(!client.configExists()) {
+                        console.log('Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!');	
+                        return; 
+                }
                 const { modRoles, guildId } = client.config;
 
                 if (reaction.emoji.name.toLowerCase().includes('mod')) {

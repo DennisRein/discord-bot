@@ -142,3 +142,4 @@ src/dev-config.json
 
 database.sqlite
 .vscode/launch.json
+config.json

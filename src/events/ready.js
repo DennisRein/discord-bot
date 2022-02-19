@@ -11,6 +11,8 @@ module.exports = {
 		}
 		const { guildId, purgeInterval } = client.config;
 
+		client.user.setActivity('deinen DMs zu, um diese annonym den Mods mitzuteilen...',{type: 'LISTENING'});
+
 		client.db.sync();
 		startInterval(client);
 		const writeLogMessage = require("../utils/writeLogMessage.js");

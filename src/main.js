@@ -41,7 +41,13 @@ try {
 	console.log("Couldn't find a Reaction Config file");
 }
 
-const eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
+let eventFiles
+try {
+	eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
+} 
+catch {
+	eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+}
 
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
@@ -54,8 +60,13 @@ for (const file of eventFiles) {
 
 
 client.commands = new Collection();
-const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
-
+let commandFiles
+try { 
+	commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
+}
+catch {
+	commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+}
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.data.name, command);

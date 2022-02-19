@@ -2,7 +2,10 @@ module.exports = {
 	name: 'guildMemberUpdate',
 	async execute(client, oldMember, newMember) {
         const writeLogMessage = require("../utils/writeLogMessage.js");
-
+        if(!client.configExists()) {
+            console.log('Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!');	
+            return; 
+        }
         const entry = await newMember.guild.fetchAuditLogs().then(audit => audit.entries.first())
         if(entry.actionType === 'UPDATE' && entry.changes[0].key === 'communication_disabled_until' && entry.target.id === oldMember.user.id) {
             writeLogMessage({ client: client, type: "userTimeouted", args: newMember, entry })
