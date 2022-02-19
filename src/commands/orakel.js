@@ -18,7 +18,7 @@ module.exports = {
         "Die Aussichten sind nicht so gut.", "Die Aussichten sind gut.", "Die Antwort ist unklar, versuche es erneut.", "Die Anzeichen deuten auf ein Ja hin.", "Sehr zweifelhaft.", "Ohne Zweifel.",
         "Ja.", "Ja - auf jeden Fall.", "Du kannst dich darauf verlassen."]
 
-        interaction.reply(responses[Math.floor(Math.random()*responses.length)])
+        interaction.reply(interaction.options.get("frage").value + "\n\n" + responses[Math.floor(Math.random()*responses.length)])
         
 	},
 };
