@@ -6,7 +6,7 @@ module.exports = {
 	async execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 
-		client.user.setActivity('dir bei einer DM',{type: "LISTENING"});
+		client.user.setActivity('melde dich hier anonym',{type: "PLAYING"});
 
 		if(!client.configExists()) {
 			return; 

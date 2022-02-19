@@ -8,7 +8,7 @@ module.exports = {
             return; 
         }
 
-        if(message.author.bot) return;
+        if(message.author?.bot) return;
 
         const writeLogMessage = require("../utils/writeLogMessage.js");
 
