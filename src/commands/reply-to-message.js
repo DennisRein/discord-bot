@@ -19,8 +19,13 @@ module.exports = {
 			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
 			return; 
 		}
-        
-        const { guildId, wunschBrunnenChannel } = interaction.client.config;
+        try {
+            const { guildId, wunschBrunnenChannel } = interaction.client.config;
+        }
+        catch {
+			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
+            return; 
+        }
 
         let id = interaction.options.get("id").value;
 

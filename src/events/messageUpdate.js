@@ -9,7 +9,8 @@ module.exports = {
         }
         const writeLogMessage = require("../utils/writeLogMessage.js");
 
-		if(oldMessage.author.id === client.id) return;
+
+        if(newMessage.author.bot) return;
 
         writeLogMessage({client: client, type: "messageUpdate", args: oldMessage, newMessage});
 	},

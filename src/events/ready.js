@@ -11,15 +11,17 @@ module.exports = {
 		}
 		const { guildId, purgeInterval } = client.config;
 
-		client.user.setActivity('deinen DMs zu, um diese annonym den Mods mitzuteilen...',{type: 'LISTENING'});
+		client.user.setActivity('deinen DMs zu, um diese annonym den Mods mitzuteilen...',{type: ' '});
 
 		client.db.sync();
-		startInterval(client);
+		client.interval = startInterval(client);
 		const writeLogMessage = require("../utils/writeLogMessage.js");
 
 		var schedule = require('node-schedule');
 
-		schedule.scheduleJob('0 0 * * * *', async () => {
+		let schedName = 'midnight';
+
+		schedule.scheduleJob(schedName, '0 0 * * * *', async () => {
 			console.log("Midnight");
 
 			var moment = require('moment'); // require
