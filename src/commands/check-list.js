@@ -4,7 +4,7 @@ const { MessageEmbed, MessageSelectMenu, Constants } = require('discord.js');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('checklist')
-        .setDescription('Lass den Bot eine Nachricht senden'),
+        .setDescription('Zeig an was so möglich ist.'),
     async execute(interaction) {
         if(!interaction.client.memberHasPermission(interaction.member)) {
 			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
