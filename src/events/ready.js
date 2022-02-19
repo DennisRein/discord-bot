@@ -2,11 +2,14 @@
 
 module.exports = {
 	name: 'ready',
-	once: true,
+	once: false,
 	async execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 
-		const { guildId } = require('../dev-config.json');
+		if(!client.configExists()) {
+			return; 
+		}
+		const { guildId, purgeInterval } = client.config;
 
 		client.db.sync();
 		startInterval(client);
@@ -27,12 +30,13 @@ module.exports = {
 				m = m[1];
 				if (m.roles.cache.size <= 1) {
 					let joined = m.joinedTimestamp
-					var newDate = moment(Date.now()).add("-14", 'days').toDate();
+					var newDate = moment(Date.now()).add(`-${purgeInterval}`, 'days').toDate();
 					if (joined < newDate) {
 						//
 						if (m.kickable) {
 							console.log(m[1].user.username);
 							count++;
+							// TODO: Enable KICK
 							//m.kick()
 						}
 					}
@@ -41,9 +45,7 @@ module.exports = {
 			if (count > 0) {
 				writeLogMessage({ client: client, type: "inactivePurge", args: count });
 			}
-
-
-		}) // run everyday at midnight
+		}) 
 	},
 };
 
@@ -51,14 +53,14 @@ async function startInterval(client) {
 	var moment = require('moment'); // require
 	const { MessageEmbed } = require('discord.js');
 
-	const { guildId, twitchNotificationChannel } = require('../dev-config.json');
+	const { guildId, twitchNotificationChannel } = client.config;
 	let guild = await client.guilds.fetch(guildId); 
 	let channel = await guild.channels.fetch(twitchNotificationChannel);
 	let liveFlag = false;
 
 	return interval = setInterval(async function () {
 		
-		client.twitch.isStreamLive("giorap90").then(stream => {
+		client.twitch.isStreamLive("honeyball").then(stream => {
 			if(!liveFlag && stream) {
 				liveFlag = true;
 				let url = "https://twitch.tv/honeyball"
@@ -73,7 +75,7 @@ async function startInterval(client) {
 				)
 				.setImage(stream.thumbnail)
 				.setTimestamp()		
-				channel.send({ embeds: [twitchEmbed] });
+				channel.send({ content: "@everyone Honeyball ist live", embeds: [twitchEmbed] });
 			}
 			else if(liveFlag && !stream) {
 				liveFlag = false;

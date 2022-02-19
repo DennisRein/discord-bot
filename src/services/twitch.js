@@ -22,7 +22,7 @@ module.exports = class Twitch {
         if(!mem) return null;
 
         let profilePic = (await mem.getUser()).profilePictureUrl;
-        let thumbnailUrl = mem.getThumbnailUrl(300, 300);
+        let thumbnailUrl = mem.getThumbnailUrl(854, 480);
         let title = mem.title;
         let viewers = mem.viewers;
         let startDate = mem.startDate;

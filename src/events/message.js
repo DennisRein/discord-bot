@@ -22,7 +22,7 @@ module.exports = {
         }
 
         if(!message.guildId ) {
-            const { guildId, wunschBrunnenChannel } = require('../dev-config.json');
+            const { guildId, wunschBrunnenChannel } = client.config;
             let buttons = getButtons();
 
             message.author.send({content: `Hey, cool, dass du dich bei mir meldest. Willst du dass die gesendete Nachricht an die Mods gesendet wird? Ich sorge dafür, dass sie nicht wissen von wem die Nachricht ist!\nDeine Nachricht:\n\`\`\`${message.content}\`\`\``, components: [buttons], fetchReply: true }).then(msg2 => {
@@ -55,7 +55,7 @@ module.exports = {
             return;
         }
 
-        const { rules, activityRole } = require('../dev-config.json');
+        const { rules, activityRole } = client.config;
 
         if(rules.channel === message.channelId) {
             if(message.content === rules.acceptMessage) {
@@ -85,8 +85,6 @@ module.exports = {
 async function botTest(client, message) {
     const writeLogMessage = require("../utils/writeLogMessage.js");
 
-
-    var moment = require('moment'); // require
     let msgs = await client.messageHelper.fetchLastMessagesByUserInInterval(message.author.id, 10);
 
     let threshold = 3; 
@@ -118,21 +116,10 @@ async function botTest(client, message) {
             deleteMessage(client, msg.channel, msg.id);
         }
         if(!member.kickable) return console.log("I cannot kick this member!");
-        member.kick();
+        // TODO: Enable KICK
+        //member.kick();
     }
     return;
-
-    if(!user.hasrole && user.activity >= 15000) {
-        fetchMember(client, message).roles.add(activityRole);
-        await client.db.userModel.update({ hasrole: 1 }, { where: { id: user.id } });
-    }
-
-    var newDate = moment(user.lastmessage).add(1, 'm').toDate();
-    if(Date.now() >= newDate) {
-        let xp = 15 + (message.content.length > 2000 ? 35 : Math.floor(message.content.length * 0,0175));
-        await client.db.userModel.update({ lastmessage: Date.now(), activity: user.activity + xp  }, { where: { id: user.id } });
-    }
-
 }
 
 async function deleteMessage(client, channelId, messageId) {
@@ -144,7 +131,6 @@ async function deleteMessage(client, channelId, messageId) {
 async function fetchUserModel(client, message) {
 
     let userId = message.author.id;
-    // equivalent to: SELECT * FROM tags WHERE name = 'tagName' LIMIT 1;
     let user = await client.db.userModel.findOne({ where: { userid: userId } });
 
     const member = fetchMember(client, message);

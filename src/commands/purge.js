@@ -27,6 +27,10 @@ module.exports = {
 			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
 			return; 
 		}
+        if(!interaction.client.configExists()) {
+			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
+			return; 
+		}
         const writeLogMessage = require("../utils/writeLogMessage.js");
         const channelID = interaction.options.get("channel") ?? null;
         const userID = interaction.options.get("user") ?? null;
@@ -55,12 +59,14 @@ module.exports = {
         let messageIDs = [];
 
         if (channel && user) {
-            let messages = await interaction.client.messageHelper.fetchAllForUserInChannel(channel);
+            let messages = await channel.messages.fetch();
+
+            messages = messages.filter(m => m.author.id === user.id);
 
 
             if (a < 0) {
                 for (let message of messages) {
-                    messageIDs.push(message.dataValues.id);
+                    messageIDs.push(message[0]);
                 }
             }
             else {
@@ -68,7 +74,7 @@ module.exports = {
                 let i = 0;
                 if (a > messages.size) a = messages.size;
                 for (let message of messages) {
-                    messageIDs.push(message.dataValues.id);
+                    messageIDs.push(message[0]);
                     i++;
                     if (i == a) break;
                 }
@@ -95,6 +101,7 @@ module.exports = {
         else if(user) {
 
             interaction.reply("Nur User wird noch nichts supportet.");
+            return;
         }
         let buttons = getButtons();
         interaction.reply({ content: `Sollen wirklich ${messageIDs.length} Nachrichten gelöscht werden?`, components: [buttons], fetchReply: true }).then(msg2 => {

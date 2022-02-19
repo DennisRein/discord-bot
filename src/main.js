@@ -25,6 +25,16 @@ client.memberHasPermission = function(member) {
 }
 
 try {
+	client.config = require('./config.json');
+}
+catch {
+	console.log("No config found");
+}
+client.configExists = function() {
+	return client.config !== undefined;
+}
+
+try {
 	const { d } = require("./reaction-config.json");
 	client.rr = new ReactionRole(client, d);
 } catch(exception) {

@@ -3,7 +3,7 @@ const { MessageEmbed } = require('discord.js');
 
 module.exports = async function writeLogMessage({client, type, ...args}) {
     
-    const { logChannel, clientId } = require('../dev-config.json');
+    const { logChannel, clientId } = client.config;
 
     const channel = client.channels.cache.get(logChannel);
     switch(type) {

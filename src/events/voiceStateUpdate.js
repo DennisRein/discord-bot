@@ -3,7 +3,7 @@
 module.exports = {
 	name: 'voiceStateUpdate',
 	async execute(client, oldState, newState) {
-        const { voiceRole } = require('../dev-config.json');
+        const { voiceRole } = client.config;
         if(!oldState.channelId) {
             if(newState.channel.type === 'GUILD_VOICE') {
                 newState.member.roles.add(voiceRole);

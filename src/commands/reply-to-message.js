@@ -4,7 +4,7 @@ const { MessageActionRow, MessageSelectMenu, Constants } = require('discord.js')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('reply-to-message')
-        .setDescription('Lass den Bot eine Nachricht senden')
+        .setDescription('Antworte auf eine private Wunschbrunnen Nachricht')
         .addStringOption(option =>
             option.setName("id")
                 .setDescription("Die ID auf die du Antworten möchtest:")
@@ -15,8 +15,12 @@ module.exports = {
 			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
 			return; 
 		}
+        if(!interaction.client.configExists()) {
+			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
+			return; 
+		}
         
-        const { guildId, wunschBrunnenChannel } = require('../dev-config.json');
+        const { guildId, wunschBrunnenChannel } = interaction.client.config;
 
         let id = interaction.options.get("id").value;
 

@@ -1,7 +1,7 @@
 module.exports = {
         name: 'messageReactionAdd',
         async execute(client, reaction, user) {
-                const { modRoles, guildId } = require('../dev-config.json');
+                const { modRoles, guildId } = client.config;
 
                 if (reaction.emoji.name.toLowerCase().includes('mod')) {
                         let guild = await client.guilds.fetch(guildId)
