@@ -22,8 +22,6 @@ module.exports = {
 		let schedName = 'midnight';
 
 		schedule.scheduleJob(schedName, '0 0 * * * *', async () => {
-			console.log("Midnight");
-
 			var moment = require('moment'); // require
 
 

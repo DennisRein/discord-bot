@@ -67,7 +67,6 @@ async function changeOption(interaction, option) {
     interaction.client.singleOptionChange = true;
     let channelRow;
     let modRoleRow;
-    console.log(option);
     switch(option.value) {
         case 'rule.acceptMessage':
             await interaction.reply({ content: "Welche Nachricht sollen neue Benutzer in die Faultierhalle schreiben um freigeschalten zu werden? Antworte bitte auf diese Nachricht mit der Phrase", fetchReply: true }).then(message => {

@@ -351,7 +351,7 @@ function isEmoji(str) {
 function getChannelMessage(reactionMap, interaction, title, description) {
 
 	let embed = new MessageEmbed().setTitle(title ?? "Reagiere auf diese Nachricht mit den angezeigten Emotes um die dazugehörige Rolle zu erhalten!");
-	embed.setDescription = description ?? "";
+	embed.setDescription(description ?? "");
 
 	for (const [key, value] of Object.entries(reactionMap)) {
 		if (isEmoji(key)) {
@@ -377,11 +377,9 @@ function getEmbed(channel, description, reactionMap, interaction) {
 
 	for (const [key, value] of Object.entries(reactionMap)) {
 		if (isEmoji(key)) {
-			console.log("Is Emoji");
 			embed.addField(value.name, key)
 		}
 		else {
-			console.log("Is not Emoji");
 			const emoji = interaction.guild.emojis.cache.get(key)
 			embed.addField(value.name, `<:${emoji.name}:${emoji.id}>`)
 		}
