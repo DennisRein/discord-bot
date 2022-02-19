@@ -16,10 +16,7 @@ module.exports = {
 
         writeLogMessage({client: client, type: "guildMemberAdd", args: member});
 
-        const note = client.emojis.cache.find(emoji => emoji.name === "Note");
-        const yuhu = client.emojis.cache.find(emoji => emoji.name === "yuhu");
-
-        let message = welcomeMessage.replace("{0}", member).replace("{1}", channel)//`Willkommen ${member}, viel Spaß im Igelbau ${yuhu} ! Infos zu den Regeln findest du in ${channelRule} und ansonsten kannst du dich gerne auch fragend an Moderatoren wenden. ${note}`
+        let message = welcomeMessage.replace("{0}", member).replace("{1}", channelRule)//`Willkommen ${member}, viel Spaß im Igelbau ${yuhu} ! Infos zu den Regeln findest du in ${channelRule} und ansonsten kannst du dich gerne auch fragend an Moderatoren wenden. ${note}`
         
         channel.send(message);
 	},

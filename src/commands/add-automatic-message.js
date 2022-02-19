@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ChannelType } = require('@discordjs/builders');
-const { MessageActionRow, MessageSelectMenu, Constants } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, Constants, MessageEmbed } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,7 +16,12 @@ module.exports = {
             option
                 .setName('interval')
                 .setRequired(true)
-                .setDescription('Alle wieviel Minuten soll die Nachricht gesendet werden?')),
+                .setDescription('Alle wieviel Minuten soll die Nachricht gesendet werden?'))
+        .addStringOption(option =>
+            option.setName("title")
+                .setDescription("Der Titel, welcher in der Nachricht angezeigt wird")
+                .setRequired(false)
+        ),
     async execute(interaction) {
 
 		if(!interaction.client.memberHasPermission(interaction.member)) {
@@ -31,6 +36,14 @@ module.exports = {
         let interval = interaction.options.get("interval").value;
         const channel = await interaction.client.channels.fetch(channelID);
 
+        let title;
+        if (interaction.options.get("title")) {
+            title = interaction.options.get("title").value;
+        }
+        else {
+            title = "";
+        }
+
         let botMessage = "Antworte bitte auf diese Nachricht mit der Nachricht die du senden willst, du hast eine Minute Zeit: ";
 		await interaction.reply({ content: botMessage, fetchReply: true }).then(message => {
             const SECONDS_TO_REPLY = 60 // replace 60 with how long to wait for message(in seconds).
@@ -44,15 +57,19 @@ module.exports = {
                 }
             });
             collector.on('collect', collected => {
-                channel.send(collected.content);
+                let embed = new MessageEmbed();
+                embed.title = title;
+                embed.description = collected.content;
+                channel.send({embeds: [embed]});
                 interaction.client.db.autoMessageModel.create({
                     message: collected.content,
+                    title: title,
                     channel: channelID,
                     interval: interval,
                     lastsend: Date.now(),
                 });
             
-                return interaction.followUp(`Automatische Nachricht wird alle ${interval} Sekunden in den Channel ${channel.name} gesendet`);
+                return interaction.followUp(`Automatische Nachricht wird alle ${interval} Minuten in den Channel ${channel.name} gesendet`);
             })
         });
 

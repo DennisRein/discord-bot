@@ -56,7 +56,7 @@ module.exports = async function selection(client, interaction) {
 								let conf;
 								for (const [key, value] of Object.entries(map)) {
 									send.react(key);
-									conf = createConf({ messageId: send.id, reaction: key, roleId: value.id, timed: timed })
+									conf = createConf(interaction.client, { messageId: send.id, reaction: key, roleId: value.id, timed: timed })
 								}
 								if (client.rr) {
 									client.rr.teardown();

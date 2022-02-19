@@ -9,6 +9,8 @@ module.exports = {
             return;
 
         if(message.guildId) {
+            let user = await fetchUserModel(client, message);
+
             client.db.messages.create({
                 id: message.id,
                 sender: message.author.id,
@@ -64,6 +66,7 @@ module.exports = {
             if(message.content === rules.acceptMessage) {
                 let member = fetchMember(client, message);
                 member.roles.add(rules.baseRole);
+                message.delete();
             }
         }
         else {

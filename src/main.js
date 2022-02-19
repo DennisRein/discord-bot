@@ -46,6 +46,7 @@ try {
 	eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
 } 
 catch {
+	client.isproductive = true;
 	eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 }
 
