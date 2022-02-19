@@ -96,6 +96,7 @@ module.exports = class DB {
                 type: Sequelize.STRING
             },
             message: Sequelize.TEXT,
+            title: Sequelize.TEXT,
             interval: {
                 type: Sequelize.INTEGER,
                 allowNull: false,

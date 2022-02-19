@@ -54,7 +54,6 @@ module.exports = {
         else {
             description = "Keine Beschreibung";
         }
-
         if (interaction.options.get("title")) {
             title = interaction.options.get("title").value;
         }
@@ -69,7 +68,7 @@ module.exports = {
         }
 
         const roles = getRoles(interaction);
-        if (interaction.options.get("long_description")) {
+        if (interaction.options.get("long_description")?.value) {
             await interaction.reply({ content: "Antworte auf diese Nachricht mit dem langen Fließtext, welcher die Reaction Role Nachricht näher erklärt.", fetchReply: true }).then(message => {
 
                 const SECONDS_TO_REPLY = 60 // replace 60 with how long to wait for message(in seconds).
@@ -109,7 +108,7 @@ module.exports = {
 
         const embed = getEmbed(channel, title, description, timed);
 
-        if (!interaction.options.get("long_description"))
+        if (!interaction.options.get("long_description")?.value)
             await interaction.reply({ content: `Wähle die Rollen, welche durch die Nachricht verteilt werden sollen: ${channel}`, components: [row], embeds: [embed] });
 
     },

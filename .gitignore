@@ -144,3 +144,4 @@ database.sqlite
 .vscode/launch.json
 config.json
 src/config.json
+reaction-config.json

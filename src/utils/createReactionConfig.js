@@ -1,7 +1,9 @@
-module.exports = function writeEntry(entry) {
+module.exports = function writeEntry(client, entry) {
     var fs = require('fs');
     let path = "./src/reaction-config.json";
-
+    if(client.isproductive) {
+        path = "reaction-config.json";
+    }
     try {
         const { d } = require("../reaction-config.json");
         d.push(entry)

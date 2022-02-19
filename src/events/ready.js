@@ -6,12 +6,13 @@ module.exports = {
 	async execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 
+		client.user.setActivity('dir bei einer DM',{type: "LISTENING"});
+
 		if(!client.configExists()) {
 			return; 
 		}
 		const { guildId, purgeInterval } = client.config;
 
-		client.user.setActivity('deinen DMs zu, um diese annonym den Mods mitzuteilen...',{type: ' '});
 
 		client.db.sync();
 		client.interval = startInterval(client);
@@ -38,7 +39,7 @@ module.exports = {
 						if (m.kickable) {
 							console.log(m[1].user.username);
 							count++;
-							// TODO: Enable KICK
+							//  Enable KICK
 							//m.kick()
 						}
 					}
@@ -96,7 +97,10 @@ async function startInterval(client) {
 					let channel = client.channels.cache.get(msg.channel);
 					client.db.autoMessageModel.update({ lastsend: now }, { where: { id: msg.id } });
 
-					channel.send(msg.message);
+					let embed = new MessageEmbed();
+					embed.title = msg.title;
+					embed.description = msg.message;
+					channel.send({embeds: [embed]});
 				}
 			}
 		})
