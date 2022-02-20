@@ -128,6 +128,10 @@ async function startInterval(client) {
 					}
 				}
 			catch(exception) {
+				let e = entry.dataValues;
+				let userid = e.userid;
+				client.db.timedRolesModel.destroy({ where: { userid: userid } });	
+
 				console.error("Problem with entry: ", entry);
 			}
 			}
