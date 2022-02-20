@@ -150,7 +150,7 @@ async function fetchUserModel(client, message) {
         username: member.user.username,
         lastmessage: Date.now(),
         joined: member.joinedTimestamp,
-        activity: 0
+        activity: client.activity[userId] ?? 0
     });
 
     return user;
