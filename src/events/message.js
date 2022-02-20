@@ -80,7 +80,7 @@ module.exports = {
 
             var newDate = moment(user.lastmessage).add(1, 'm').toDate();
             if(Date.now() >= newDate) {
-                let xp = 15 + (message.content.length > 2000 ? 35 : Math.floor(message.content.length * 0,0175));
+                let xp = 15 + (message.content.length > 2000 ? 35 : Math.floor(message.content.length * 0.0175));
                 await client.db.userModel.update({ lastmessage: Date.now(), activity: user.activity + xp  }, { where: { id: user.id } });
             }
         }

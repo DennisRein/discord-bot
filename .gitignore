@@ -145,3 +145,4 @@ database.sqlite
 config.json
 src/config.json
 reaction-config.json
+/.VSCodeCounter
