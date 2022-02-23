@@ -12,11 +12,12 @@ module.exports = {
                 .setDescription("Get specific information to one command")
                 .setRequired(false)
         }),
-	execute(interaction) {
+    async execute(interaction) {
         if(!interaction.client.memberHasPermission(interaction.member)) {
 			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
 			return; 
 		}
+        
 		const data = [];
 		const { commands } = interaction.client;
 
