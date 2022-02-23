@@ -13,6 +13,15 @@ module.exports = {
                 .setRequired(true)
         }),
 	execute(interaction) {
+        if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
+        if(!interaction.client.configExists()) {
+			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
+			return; 
+		}
+        
 		let responses = ["So wie ich es sehe, ja.", "Frag später noch einmal.", "Ich sage es besser nicht jetzt.", "Kann ich jetzt nicht vorhersagen.", "Konzentrier dich und fragen nochmal.",
         "Verlass dich nicht drauf.", "Es ist sicher.", "Es ist eindeutig so.", "Höchstwahrscheinlich.", "Meine Antwort ist nein.", "Meine Quellen sagen nein.",
         "Die Aussichten sind nicht so gut.", "Die Aussichten sind gut.", "Die Antwort ist unklar, versuche es erneut.", "Die Anzeichen deuten auf ein Ja hin.", "Sehr zweifelhaft.", "Ohne Zweifel.",

