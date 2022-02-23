@@ -10,6 +10,8 @@
     "@twurple/auth": "^5.0.17",
     "@twurple/eventsub": "^5.0.17",
     "bufferutil": "^4.0.6",
+    "canvas": "^2.9.0",
+    "canvas-text-block": "^1.1.0",
     "discord-api-types": "^0.26.1",
     "discord.js": "^13.6.0",
     "discordjs-reaction-role": "^2.1.1",
