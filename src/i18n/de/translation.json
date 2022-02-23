@@ -1,0 +1,10 @@
+{
+  "onWelcomeResponse": "{{user}} welcome!",
+  "onCountUserAmount": "User count:",    
+  "keyPong": "Pong! E",
+  "commandAutomaticDescription": "1Lass den Bot eine Nachricht in einem bestimmten Intervall senden!",
+  "commandAutomaticAttributeChannelDescription": "In welchen Kanal möchtest du die Nachricht senden?",
+  "commandAutomaticAttributeIntervalDescription": "Alle wieviel Minuten soll die Nachricht gesendet werden?",
+  "commandAutomaticAttributeTitleDescription": "Der Titel, welcher in der Nachricht angezeigt wird"
+  
+}

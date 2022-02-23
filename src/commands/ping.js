@@ -13,7 +13,7 @@ module.exports = {
 			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
 			return; 
 		}
-        console.log("Pong");
-        await interaction.reply('Pong!');
+        console.log(interaction.client.i18n.t('keyPong'));
+        await interaction.reply(interaction.client.i18n.t('keyPong'));
 	},
 };

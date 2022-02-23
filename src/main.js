@@ -11,7 +11,11 @@ const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_M
 const DB = require('./db.js');
 const Twitch = require('./services/twitch.js');
 const MessageHelper = require('./utils/messageHelper.js');
+const { i18next } = require("./i18n.js")
+
 client.activity = require('./activity.json');
+
+client.i18n = i18next;
 
 client.twitch = new Twitch();
 
