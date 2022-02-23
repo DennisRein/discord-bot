@@ -27,7 +27,7 @@ module.exports = {
                 .addChoice('Closed Eyes', 'closed_eyes')
                 .addChoice('Eherm', 'eherm')
                 .addChoice('Eww', 'ew')
-                .addChoice('Laser', 'bitchpls')
+                .addChoice('Laser', 'laser')
                 .addChoice('Pirat', 'pirat')
                 .addChoice('Please', 'pls')
                 .addChoice('Ugh', 'ugh')
@@ -35,7 +35,15 @@ module.exports = {
                 .addChoice('Was', 'what')
         ),
 	async execute(interaction) {
-
+        if(!interaction.client.memberHasPermission(interaction.member)) {
+			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
+			return; 
+		}
+        if(!interaction.client.configExists()) {
+			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
+			return; 
+		}
+        
         let text = interaction.options.get("text").value;
 
         let imageType = interaction.options.get("graphic").value;
@@ -80,10 +88,9 @@ module.exports = {
 
         const attachment = new MessageAttachment(canvas.toBuffer(), 'graphic.png');
 
+        //const user = await interaction.client.users.fetch("338771212383551488").catch(console.error);
+        //user.send({ files: [attachment] })
 
-
-        //console.log(interaction);
-        //interaction.channel.send({ files: [attachment] })
         interaction.reply({ files: [attachment] });
         
 	},
