@@ -6,6 +6,9 @@ module.exports = {
 	async execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 
+		console.log("Loading Bad Domains");
+		await client.badDomainChecker.init();
+
 		client.user.setActivity('melde dich hier anonym',{type: "PLAYING"});
 
 		if(!client.configExists()) {
@@ -22,7 +25,7 @@ module.exports = {
 
 		let schedName = 'midnight';
 
-		schedule.scheduleJob(schedName, '0 0 * * * *', async () => {
+		schedule.scheduleJob(schedName, '0 0 0 * * *', async () => {
 			var moment = require('moment'); // require
 
 
