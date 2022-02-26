@@ -20,6 +20,8 @@ module.exports = {
                 
             });
 
+            badPhraseTest(client, message);
+
             botTest(client, message);
         }
 
@@ -86,6 +88,32 @@ module.exports = {
         }
 	},
 };
+
+async function badPhraseTest(client, message) {
+    let txt = message.content;
+    if(client.badDomainChecker.stringHasBadPhrase(txt)) {
+        clearMessage(client, message);
+    }
+
+    let url = client.badDomainChecker.stringHasURL(txt);
+    if(url && client.badDomainChecker.isBadURL(url)) {
+        clearMessage(client, message);
+    }
+}
+
+function clearMessage(client, message) {
+    const writeLogMessage = require("../utils/writeLogMessage.js");
+
+    message.delete();
+
+    writeLogMessage({client: client, type: "botDetected", args: [0], message});
+
+    let member = fetchMember(client, message);
+
+    if(!member.kickable) return console.log("I cannot kick this member!");
+    // TODO: Enable KICK
+    //member.kick();
+}
 
 
 async function botTest(client, message) {

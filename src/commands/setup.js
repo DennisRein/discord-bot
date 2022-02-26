@@ -337,7 +337,7 @@ function getDays() {
 	for(let i = 1; i < 25; i++) {
 		let option = {
             label: i.toString(),
-            description: i.toString(),
+            description: "Days",
             value: i.toString()
         }
 		array.push(option);

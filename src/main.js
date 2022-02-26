@@ -11,6 +11,8 @@ const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_M
 const DB = require('./db.js');
 const Twitch = require('./services/twitch.js');
 const MessageHelper = require('./utils/messageHelper.js');
+const BadDomainChecker = require('./utils/badDomainChecker.js');
+
 client.activity = require('./activity.json');
 
 client.twitch = new Twitch();
@@ -20,6 +22,8 @@ client.db = new DB();
 client.db.init();
 
 client.messageHelper = new MessageHelper(client);
+
+client.badDomainChecker = new BadDomainChecker(client);
 
 client.memberHasPermission = function(member) {
 	return member.permissions.has(Permissions.FLAGS.KICK_MEMBERS) || member.user.id === "228154435589767168"
@@ -41,6 +45,15 @@ try {
 } catch(exception) {
 	console.log("Couldn't find a Reaction Config file");
 }
+
+try {
+	client.phrases = require("./phrases.json");
+}
+catch {
+	client.phrases = [];
+	console.log("No phrases found");
+}
+
 
 let eventFiles
 try {
