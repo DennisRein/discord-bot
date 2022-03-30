@@ -3,12 +3,14 @@ const { MessageEmbed } = require('discord.js');
 
 module.exports = async function writeLogMessage({client, type, ...args}) {
     
-    const { logChannel, clientId } = client.config;
+    const { logChannel, clientId, hiByeChannel } = client.config;
 
     const channel = client.channels.cache.get(logChannel);
+
+    const hbChannel = client.channels.cache.get(hiByeChannel);
     switch(type) {
         case "guildMemberAdd": {
-            return channel.send({embeds: [getMemberEmbed(args.args)]});
+            return hbChannel.send({embeds: [getMemberEmbed(args.args)]});
         }
         case "messageUpdate": {
             if(!args.args.author) return;
@@ -51,7 +53,7 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             return channel.send({embeds: [getInactivePurgedEmbed(args)]})
         }
         case "userLeft": {
-            return channel.send({embeds: [getUserLeftEmbed(args)]})
+            return hbChannel.send({embeds: [getUserLeftEmbed(args)]})
 
         }
     }

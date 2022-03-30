@@ -12,14 +12,17 @@ const DB = require('./db.js');
 const Twitch = require('./services/twitch.js');
 const MessageHelper = require('./utils/messageHelper.js');
 const BadDomainChecker = require('./utils/badDomainChecker.js');
+client.db = new DB();
+
+client.db.init();
+
+client.db.sync();
 
 client.activity = require('./activity.json');
 
 client.twitch = new Twitch();
 
-client.db = new DB();
 
-client.db.init();
 
 client.messageHelper = new MessageHelper(client);
 

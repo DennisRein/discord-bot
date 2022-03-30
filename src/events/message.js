@@ -65,7 +65,7 @@ module.exports = {
         const { rules, activityRole } = client.config;
 
         if(rules.channel === message.channelId) {
-            if(message.content.toLowerCase().includes(rules.acceptMessage.toLowerCase())) {
+            if(message.content.toLowerCase().includes(rules.acceptMessage.toLowerCase()) && rules.baseRole) {
                 let member = fetchMember(client, message);
                 member.roles.add(rules.baseRole);
                 message.delete();

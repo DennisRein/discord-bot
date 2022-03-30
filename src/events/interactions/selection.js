@@ -329,7 +329,7 @@ module.exports = async function selection(client, interaction) {
 		interaction.client.config.hiByeChannel = selectedChannel;
 
 		if (!interaction.client.singleOptionChange) {
-			await interaction.followUp({ content: `Alles klar, damit habe ich alles! Ich starte jetzt nochmal neu um alle Einstellung zu übernehmen und danach könnt ihr mich mit dem /help Befehl erkunden! Bis später!` });
+			await interaction.reply({ content: `Alles klar, damit habe ich alles! Ich starte jetzt nochmal neu um alle Einstellung zu übernehmen und danach könnt ihr mich mit dem /help Befehl erkunden! Bis später!` });
 			const createConf = require("../../utils/createConfig");
 			createConf(interaction.client);
 
