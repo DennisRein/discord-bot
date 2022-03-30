@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-const pagehash = require("page-hash");
 
 module.exports = class BadDomainChecker { 
 

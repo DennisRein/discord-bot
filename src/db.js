@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 module.exports = class DB {
 
     init() {
+        console.log("Init DB");
         this.sequelize();
         this.initiateModels();
     }

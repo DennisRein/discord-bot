@@ -293,7 +293,7 @@ module.exports = async function selection(client, interaction) {
 		interaction.client.config.twitchNotificationChannel = selectedChannel;
 
 		if (!interaction.client.singleOptionChange) {
-			await interaction.reply({ content: "Die letzte Frage, wie soll die Nachricht aussehen, wenn Honeyball live geht? Antworte bitte auf diese Nachricht mit der Nachricht", fetchReply: true }).then(message => {
+			await interaction.reply({ content: "Wie soll die Nachricht aussehen, wenn Honeyball live geht? Antworte bitte auf diese Nachricht mit der Nachricht", fetchReply: true }).then(message => {
 
 				const SECONDS_TO_REPLY = 60 // replace 60 with how long to wait for message(in seconds).
 				const MESSAGES_TO_COLLECT = 1
@@ -307,13 +307,33 @@ module.exports = async function selection(client, interaction) {
 				});
 				collector.on('collect', async collected => {
 					interaction.client.config.twitchLiveMessage = collected.content;
-					await interaction.followUp({ content: `Alles klar, damit habe ich alles! Ich starte jetzt nochmal neu um alle Einstellung zu übernehmen und danach könnt ihr mich mit dem /help Befehl erkunden! Bis später!` });
-					const createConf = require("../../utils/createConfig");
-					createConf(interaction.client);
+					
+					let channelRow = new MessageActionRow()
+					.addComponents(
+						new MessageSelectMenu()
+							.setCustomId('hiBye-selection')
+							.setPlaceholder('Hi-Bye-Channel?')
+							.addOptions(getChannels(interaction))
+					);
 
-					interaction.client.emit('ready', interaction.client);
+					await interaction.followUp({ content: `In welchen Channel soll auflisten, falls jemand kommt und geht?`, components: [channelRow]})
+
 				})
 			})
+		}
+	}
+
+	if(interaction.customId === 'hiBye-selection') {
+
+		let selectedChannel = interaction.values[0];
+		interaction.client.config.hiByeChannel = selectedChannel;
+
+		if (!interaction.client.singleOptionChange) {
+			await interaction.reply({ content: `Alles klar, damit habe ich alles! Ich starte jetzt nochmal neu um alle Einstellung zu übernehmen und danach könnt ihr mich mit dem /help Befehl erkunden! Bis später!` });
+			const createConf = require("../../utils/createConfig");
+			createConf(interaction.client);
+
+			interaction.client.emit('ready', interaction.client);
 		}
 	}
 

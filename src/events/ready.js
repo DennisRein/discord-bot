@@ -9,6 +9,8 @@ module.exports = {
 		console.log("Loading Bad Domains");
 		await client.badDomainChecker.init();
 
+		client.db.sync();
+		
 		client.user.setActivity('melde dich hier anonym',{type: "PLAYING"});
 
 		if(!client.configExists()) {
@@ -16,8 +18,6 @@ module.exports = {
 		}
 		const { guildId, purgeInterval } = client.config;
 
-
-		client.db.sync();
 		client.interval = startInterval(client);
 		const writeLogMessage = require("../utils/writeLogMessage.js");
 
