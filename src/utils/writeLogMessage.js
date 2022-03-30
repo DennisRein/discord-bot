@@ -64,7 +64,7 @@ function getUserLeftEmbed(args) {
 
 function getInactivePurgedEmbed(args) {
     return new MessageEmbed()
-        .setTitle(`Ich hätte ${args.args} Benutzer vom Server entfernt die nach zwei Wochen keine Rolle erhalten haben. Die Kickfunktion ist jedoch noch temporär deaktiviert um die Entdeckte Anzahl zu prüfen.`)
+        .setTitle(`Ich hätte ${args.args} Benutzer vom Server entfernt die nach zwei Wochen keine Rolle erhalten haben. Die Kickfunktion ist jedoch noch temporär deaktiviert um die entdeckte Anzahl zu prüfen.`)
     }
 
 function getBotEmbed(args) {

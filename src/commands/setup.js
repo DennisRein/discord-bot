@@ -14,6 +14,7 @@ module.exports = {
                 .addChoice('Bot Log Channel', 'logChannel')
                 .addChoice('Faultierhalle', 'rules.channel')
                 .addChoice('Faultier, bzw. Rolle für Neue', 'rule.baseRole')
+                .addChoice('Hi-Bye-Channel', 'hiBye')
                 .addChoice('Mod Rollen', 'modRoles')
                 .addChoice('Purge Intervall', 'purgeInterval')
                 .addChoice('Regel Channel', 'ruleChannel')
@@ -109,6 +110,18 @@ async function changeOption(interaction, option) {
             );
     
             await interaction.reply({ content: `In welchen Channel soll ich meinen Log Output schreiben?`, components: [modRoleRow]});
+    
+            break;
+        case 'hiBye':
+            modRoleRow = new MessageActionRow()
+            .addComponents(
+                new MessageSelectMenu()
+                    .setCustomId('hiBye-selection')
+                    .setPlaceholder('Hi-Bye-Channel?')
+                    .addOptions(getChannels(interaction))
+            );
+    
+            await interaction.reply({ content: `In welchen Channel soll auflisten, falls jemand kommt und geht?`, components: [modRoleRow]});
     
             break;
         case 'rules.channel':
