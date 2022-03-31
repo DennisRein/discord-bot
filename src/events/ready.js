@@ -11,7 +11,7 @@ module.exports = {
 
 		client.db.sync();
 		
-		client.user.setActivity('melde dich hier anonym',{type: "PLAYING"});
+		//client.user.setActivity('melde dich hier anonym',{type: "PLAYING"});
 
 		if(!client.configExists()) {
 			return; 
