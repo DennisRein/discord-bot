@@ -28,7 +28,7 @@ module.exports = {
         if(!message.guildId ) {
             const { guildId, wunschBrunnenChannel } = client.config;
             let buttons = getButtons();
-
+            return;
             message.author.send({content: `Hey, cool, dass du dich bei mir meldest. Willst du dass die gesendete Nachricht an die Mods gesendet wird? Ich sorge dafür, dass sie nicht wissen von wem die Nachricht ist!\nDeine Nachricht:\n\`\`\`${message.content}\`\`\``, components: [buttons], fetchReply: true }).then(msg2 => {
                 const collector = msg2.channel.createMessageComponentCollector({ time: 15000 });
     
@@ -65,7 +65,7 @@ module.exports = {
         const { rules, activityRole } = client.config;
 
         if(rules.channel === message.channelId) {
-            if(message.content.toLowerCase().includes(rules.acceptMessage.toLowerCase()) && rules.baseRole) {
+            if(rules.acceptMessage && message.content.toLowerCase().includes(rules.acceptMessage.toLowerCase()) && rules.baseRole) {
                 let member = fetchMember(client, message);
                 member.roles.add(rules.baseRole);
                 message.delete();

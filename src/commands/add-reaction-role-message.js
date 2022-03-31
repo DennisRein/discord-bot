@@ -68,6 +68,7 @@ module.exports = {
         }
 
         const roles = getRoles(interaction);
+        console.log(roles);
         if (interaction.options.get("long_description")?.value) {
             await interaction.reply({ content: "Antworte auf diese Nachricht mit dem langen Fließtext, welcher die Reaction Role Nachricht näher erklärt.", fetchReply: true }).then(message => {
 
@@ -135,12 +136,14 @@ function getRoles(interaction) {
         let r = role[1];
         let id = r.id;
         let name = r.name;
-        let option = {
-            label: name,
-            description: id,
-            value: id
+        if(!(name.toLowerCase().includes("mod") || name.toLowerCase().includes("new") || name.toLowerCase().includes("admin") || name.toLowerCase().includes("bot") )) {
+            let option = {
+                label: name,
+                description: id,
+                value: id
+            }
+            array.push(option);
         }
-        array.push(option);
     }
 
     return array;

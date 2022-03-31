@@ -337,6 +337,19 @@ module.exports = async function selection(client, interaction) {
 		}
 	}
 
+	if (interaction.customId === 'modRole-done') {
+		let selectedRoles = interaction.values;
+
+		interaction.client.config.modRoles = selectedRoles;
+		if (!interaction.client.singleOptionChange) {
+			await interaction.reply({ content: `Alles klar, damit habe ich alles! Ich starte jetzt nochmal neu um alle Einstellung zu übernehmen und danach könnt ihr mich mit dem /help Befehl erkunden! Bis später!` });
+			const createConf = require("../../utils/createConfig");
+			createConf(interaction.client);
+
+			interaction.client.emit('ready', interaction.client);
+		}
+	}
+
 	if (interaction.client.singleOptionChange) {
 
 		const createConf = require("../../utils/createConfig");
