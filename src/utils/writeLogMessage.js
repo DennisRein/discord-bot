@@ -53,6 +53,8 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             return channel.send({embeds: [getInactivePurgedEmbed(args)]})
         }
         case "userLeft": {
+            console.log("User left", args)
+
             return hbChannel.send({embeds: [getUserLeftEmbed(args)]})
 
         }
@@ -159,7 +161,7 @@ function getNicknameChangedEmbed(args) {
     let oldMemberName = args.args.nickname ?? args.args.user.username;
     let newMemberName = args.newMember.nickname ?? args.newMember.user.username;
     return new MessageEmbed()
-    .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat seinen Namen geändert.`)
+    .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Namen geändert.`)
     .addFields(
         { name: 'Alter Name:', value: oldMemberName },
         { name: 'Neuer Name:', value: newMemberName },

@@ -30,9 +30,12 @@ module.exports = {
 
         const user = await interaction.client.users.fetch(userid).catch(console.error);
 
+        console.log(user.canSendMessage)
         if(user.canSendMessage)
-        user.send(interaction.options.get("message").value);
-
+        {
+            
+            user.send(interaction.options.get("message").value);
+        }
         interaction.reply("Send")
         /*let botMessage = "Antworte bitte auf diese Nachricht mit der Nachricht die du senden willst, du hast eine Minute Zeit: ";
 		await interaction.reply({ content: botMessage, fetchReply: true }).then(message => {

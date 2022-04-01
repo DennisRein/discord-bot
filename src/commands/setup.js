@@ -10,49 +10,42 @@ module.exports = {
                 .setName("log-channel")
                 .setDescription("In welchen Channel soll ich meinen Log Output schreiben?")
                 .setRequired(true)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
         })
         .addChannelOption(channel => {
             return channel // Add return here
                 .setName("hi-bye-channel")
                 .setDescription("In welchen Channel soll auflisten, falls jemand kommt und geht?")
                 .setRequired(true)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
         })
         .addChannelOption(channel => {
             return channel // Add return here
                 .setName("faultierhalle")
                 .setDescription("Welcher Channel ist die Faultierhalle?")
                 .setRequired(true)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
         })
         .addChannelOption(channel => {
             return channel // Add return here
                 .setName("rules-channel")
                 .setDescription("Welcher Channel ist der Regel Channel auf den ich neue User verweise?")
                 .setRequired(true)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
         })
         .addChannelOption(channel => {
             return channel // Add return here
                 .setName("twitch-channel")
                 .setDescription("In welchen Channel schreibe ich die Benachrichtigung, dass Honeyball live ist?")
                 .setRequired(true)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
         })
         .addChannelOption(channel => {
             return channel // Add return here
                 .setName("welcome-channel")
                 .setDescription("In welchem Channel soll ich die Neuen willkommen heißen?")
                 .setRequired(true)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
         })        
         .addChannelOption(channel => {
             return channel // Add return here
                 .setName("wunschbrunnen-channel")
                 .setDescription("In welchen Channel werden private Anliegen von Benutzern mit euch geteilt?")
                 .setRequired(true)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
         })
         .addRoleOption(role => {
             return role // Add return here

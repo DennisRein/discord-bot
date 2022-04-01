@@ -136,7 +136,15 @@ function getRoles(interaction) {
         let r = role[1];
         let id = r.id;
         let name = r.name;
-        if(!(name.toLowerCase().includes("mod") || name.toLowerCase().includes("new") || name.toLowerCase().includes("admin") || name.toLowerCase().includes("bot") )) {
+        if(!(name.toLowerCase().includes("mod") || name.toLowerCase().includes("new") || name.toLowerCase().includes("admin") || name.toLowerCase().includes("bot") || name.toLowerCase().includes("twitch") || name.toLowerCase().includes("nitro"))) {
+            let option = {
+                label: name,
+                description: id,
+                value: id
+            }
+            array.push(option);
+        }
+        else if (name.toLowerCase().includes("urlaub")) {
             let option = {
                 label: name,
                 description: id,
