@@ -10,7 +10,7 @@ module.exports = {
 		await client.badDomainChecker.init();
 
 		client.db.sync();
-		
+	
 		//client.user.setActivity('melde dich hier anonym',{type: "PLAYING"});
 
 		if(!client.configExists()) {
@@ -127,8 +127,9 @@ async function startInterval(client) {
 					let message = await channel.messages.fetch(messageid);
 					
 					console.log("Removing timed roles")
-					console.log(e.userid, client.id);
-					if (now >= e.loseroleafter && e.userid && e.userid !== client.id) {
+					console.log(e.userid, client.user.id);
+					if (now >= e.loseroleafter && e.userid && e.userid !== client.user.id) {
+						console.log("Removed user: ", e.userid)
 						message.reactions.resolve(reaction).users.remove(userid);
 						member.roles.remove(roleid);
 						client.db.timedRolesModel.destroy({ where: { userid: userid } });	
