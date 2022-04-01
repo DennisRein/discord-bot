@@ -8,7 +8,6 @@ module.exports = {
                 return; 
         }
         const { welcomeChannel, ruleChannel, welcomeMessage } = client.config;
-        
         const writeLogMessage = require("../utils/writeLogMessage.js");
         
         const channel = client.channels.cache.get(welcomeChannel);

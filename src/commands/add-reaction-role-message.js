@@ -68,7 +68,7 @@ module.exports = {
         }
 
         const roles = getRoles(interaction);
-        console.log(roles);
+        console.log("Reaction Role Role Amount:", roles.length);
         if (interaction.options.get("long_description")?.value) {
             await interaction.reply({ content: "Antworte auf diese Nachricht mit dem langen Fließtext, welcher die Reaction Role Nachricht näher erklärt.", fetchReply: true }).then(message => {
 
@@ -136,7 +136,15 @@ function getRoles(interaction) {
         let r = role[1];
         let id = r.id;
         let name = r.name;
-        if(!(name.toLowerCase().includes("mod") || name.toLowerCase().includes("new") || name.toLowerCase().includes("admin") || name.toLowerCase().includes("bot") )) {
+        if(!(name.toLowerCase().includes("mod") || name.toLowerCase().includes("new") || name.toLowerCase().includes("admin") || name.toLowerCase().includes("bot") || name.toLowerCase().includes("twitch") || name.toLowerCase().includes("nitro"))) {
+            let option = {
+                label: name,
+                description: id,
+                value: id
+            }
+            array.push(option);
+        }
+        else if (name.toLowerCase().includes("urlaub")) {
             let option = {
                 label: name,
                 description: id,
