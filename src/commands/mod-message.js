@@ -30,13 +30,15 @@ module.exports = {
 
         const user = await interaction.client.users.fetch(userid).catch(console.error);
 
-        console.log(user.canSendMessage)
-        if(user.canSendMessage)
-        {
-            
+        console.log(user)
+        try {
             user.send(interaction.options.get("message").value);
+            interaction.reply("Send")
         }
-        interaction.reply("Send")
+        catch(e) {
+            interaction.reply("Es gab ein Problem beim Senden, der Benutzer erlaubt wahrscheinlich keine DMs")
+
+        }
         /*let botMessage = "Antworte bitte auf diese Nachricht mit der Nachricht die du senden willst, du hast eine Minute Zeit: ";
 		await interaction.reply({ content: botMessage, fetchReply: true }).then(message => {
   
