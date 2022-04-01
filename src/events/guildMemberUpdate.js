@@ -12,11 +12,10 @@ module.exports = {
 
             return;
         }
+        if(oldMember.nickname !== newMember.nickname && entry.changes && entry.changes[0] && entry.changes[0].key === 'nick') return writeLogMessage({client: client, type: "nicknameChanged", args: oldMember, newMember});
         
         let roles = [];
         let added = false;
-        if(oldMember.nickname !== newMember.nickname) return writeLogMessage({client: client, type: "nicknameChanged", args: oldMember, newMember});
-        
         if (oldMember.roles.cache.size > newMember.roles.cache.size) {
             oldMember.roles.cache.forEach(role => {
                 if (!newMember.roles.cache.has(role.id)) {
@@ -32,7 +31,6 @@ module.exports = {
                 }
             });
             writeLogMessage({ client: client, type: "guildMemberUpdate", args: added, roles, newMember });
-
         }
         },
 };
