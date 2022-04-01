@@ -16,6 +16,9 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
         case "messageUpdate": {
             console.log("messageUpdate")
             if(args.args.author && args.args.author.id === clientId) return;
+            const oldMessage = args.args;
+            const newMessage = args.newMessage;
+            //if(oldMessage.content === newMessage.content) return;
             return channel.send({embeds: [getMessageEditedEmbed(client, args)]})
         }
         case "messageDelete": {
@@ -129,7 +132,6 @@ function getMessageEditedEmbed(client, args) {
     const newMessage = args.newMessage;
     const channel = client.channels.cache.get(oldMessage.channelId);
     const channelName = channel.name;
-    console.log("Edited", newMessage);
 
     return new MessageEmbed()
         .setTitle(`${newMessage.author.username} <${newMessage.author.discriminator}> hat eine Nachricht bearbeitet`)
@@ -173,6 +175,8 @@ function getRoleChangedEmbed(args) {
 function getNicknameChangedEmbed(args) {
     let oldMemberName = args.args.nickname ?? args.args.user.username;
     let newMemberName = args.newMember.nickname ?? args.newMember.user.username;
+    console.log("Old Member Name: ", args.args.nickname, args.args.user.username)
+    console.log("New Member Name: ", args.newMember.nickname, args.newMember.user.username)
     return new MessageEmbed()
     .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Namen geändert.`)
     .addFields(
