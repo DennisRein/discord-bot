@@ -12,9 +12,6 @@ module.exports = {
 
         if(newMessage.author.bot) return;
 
-        console.log("New", newMessage);
-        console.log("Old", oldMessage);
-
         writeLogMessage({client: client, type: "messageUpdate", args: oldMessage, newMessage});
 	},
 };

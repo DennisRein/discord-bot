@@ -7,12 +7,10 @@ module.exports = {
         }
         const writeLogMessage = require("../utils/writeLogMessage.js");
 
-        console.log("left", member.user.username)
-
         const entry = await member.guild.fetchAuditLogs().then(audit => audit.entries.first())
 
         if(entry.executor.bot) {
-            console.log("is bot")
+            console.log(member.user.username, "is bot and left")
             return;
         
         }

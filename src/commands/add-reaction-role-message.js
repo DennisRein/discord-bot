@@ -68,7 +68,7 @@ module.exports = {
         }
 
         const roles = getRoles(interaction);
-        console.log(roles);
+        console.log("Reaction Role Role Amount:", roles.length);
         if (interaction.options.get("long_description")?.value) {
             await interaction.reply({ content: "Antworte auf diese Nachricht mit dem langen Fließtext, welcher die Reaction Role Nachricht näher erklärt.", fetchReply: true }).then(message => {
 

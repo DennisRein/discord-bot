@@ -115,7 +115,6 @@ async function changeOption(interaction, option) {
     
             break;
         case 'hiBye':
-            console.log("Hi");
             modRoleRow = new MessageActionRow()
             .addComponents(
                 new MessageSelectMenu()
