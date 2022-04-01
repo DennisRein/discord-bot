@@ -16,6 +16,13 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
         case "messageUpdate": {
             console.log("messageUpdate")
             if(args.args.author && args.args.author.id === clientId) return;
+            const oldMessage = args.args;
+            const newMessage = args.newMessage;
+            if(oldMessage.content.length + newMessage.content.length > 5500) {
+                channel.send({embeds: [getSingleMessageUpdateEmbed(client, args, false)]})
+                return channel.send({embeds: [getSingleMessageUpdateEmbed(client, args, true)]})
+
+            }
             return channel.send({embeds: [getMessageEditedEmbed(client, args)]})
         }
         case "messageDelete": {
@@ -124,21 +131,77 @@ function getMemberEmbed(member) {
         );
 }
 
+function trimMessages(msg) {
+    n = 1023;
+    let msgs = msg.match(new RegExp('.{1,' + n + '}', 'g'));
+    return msgs;
+}
+
+function getSingleMessageUpdateEmbed(client, args, isNew) {
+    let msg;
+    if(isNew) msg = args.newMessage;
+    else msg = args.args;
+    const channel = client.channels.cache.get(msg.channelId);
+    const channelName = channel.name;
+
+    let embed = new MessageEmbed();
+    embed.setTitle(`${msg.author.username} <${msg.author.discriminator}> hat eine Nachricht bearbeitet`)
+    embed.addFields(
+            { name: 'Channel:', value: `<#${channel.id}>` },
+            { name: 'Zeitpunkt:', value: new Date(msg.editedTimestamp).toISOString()},
+    );
+
+    if(msg.content.length > 1023) {
+        let msgs = trimMessages(msg.content)
+        let i = 1;
+        for(let msg of msgs) {
+            embed.addField(isNew ? `Neue Nachricht Part ${i}` : `Alte Nachricht Part ${i}`, msg)
+            i++;
+        }
+    }
+    else {
+        embed.addField(isNew ? `Neue Nachricht Part ${i}` : `Alte Nachricht Part ${i}`, msg.content  ?? "_Ich war leider nicht da, als die alte Nachricht geschrieben wurde")
+    }
+    return embed;
+}
+
 function getMessageEditedEmbed(client, args) {
     const oldMessage = args.args;
     const newMessage = args.newMessage;
     const channel = client.channels.cache.get(oldMessage.channelId);
     const channelName = channel.name;
-    console.log("Edited", newMessage);
 
-    return new MessageEmbed()
-        .setTitle(`${newMessage.author.username} <${newMessage.author.discriminator}> hat eine Nachricht bearbeitet`)
-        .addFields(
-                { name: 'Channel:', value: `<#${channel.id}>` },
-                { name: 'Zeitpunkt:', value: new Date(newMessage.editedTimestamp).toISOString()},
-                { name: "Alte Nachricht:", value: oldMessage.content ?? "_Ich war leider nicht da, als die alte Nachricht geschrieben wurde_" },
-                { name: 'Neue Nachricht:', value: newMessage.content }
-        );
+    let embed = new MessageEmbed();
+    embed.setTitle(`${newMessage.author.username} <${newMessage.author.discriminator}> hat eine Nachricht bearbeitet`)
+    embed.addFields(
+            { name: 'Channel:', value: `<#${channel.id}>` },
+            { name: 'Zeitpunkt:', value: new Date(newMessage.editedTimestamp).toISOString()},
+    );
+
+    if(oldMessage.content.length > 1023) {
+        let msgs = trimMessages(oldMessage.content)
+        let i = 1;
+        for(let msg of msgs) {
+            embed.addField(`Alte Nachricht Part ${i}`, msg)
+            i++;
+        }
+    }
+    else {
+        embed.addField("Alte Nachricht", oldMessage.content  ?? "_Ich war leider nicht da, als die alte Nachricht geschrieben wurde")
+    }
+
+    if(newMessage.content.length > 1023) {
+        let msgs = trimMessages(newMessage.content)
+        let i = 1;
+        for(let msg of msgs) {
+            embed.addField(`Neue Nachricht Part ${i}`, msg)
+            i++;
+        }
+    }
+    else {
+        embed.addField("Neue Nachricht", newMessage.content  ?? "_Ich war leider nicht da, als die alte Nachricht geschrieben wurde")
+    }
+    return embed;
 }
 
 
@@ -173,6 +236,8 @@ function getRoleChangedEmbed(args) {
 function getNicknameChangedEmbed(args) {
     let oldMemberName = args.args.nickname ?? args.args.user.username;
     let newMemberName = args.newMember.nickname ?? args.newMember.user.username;
+    console.log("Old Member Name: ", args.args.nickname, args.args.user.username)
+    console.log("New Member Name: ", args.newMember.nickname, args.newMember.user.username)
     return new MessageEmbed()
     .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Namen geändert.`)
     .addFields(
