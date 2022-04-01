@@ -9,8 +9,11 @@ module.exports = {
 
         const entry = await member.guild.fetchAuditLogs().then(audit => audit.entries.first())
 
-        if(entry.executor.bot) return;
-
+        if(entry.executor.bot) {
+            console.log(member.user.username, "is bot and left")
+            return;
+        
+        }
         if(entry.actionType === 'DELETE' && entry.action === 'MEMBER_KICK') {
             writeLogMessage({ client: client, type: "userKicked", args: member, entry })
 

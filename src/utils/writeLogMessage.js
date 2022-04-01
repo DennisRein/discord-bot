@@ -10,49 +10,61 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
     const hbChannel = client.channels.cache.get(hiByeChannel);
     switch(type) {
         case "guildMemberAdd": {
+            console.log("guildMemberAdd")
             return hbChannel.send({embeds: [getMemberEmbed(args.args)]});
         }
         case "messageUpdate": {
-            if(!args.args.author) return;
-            if(args.args.author.id === clientId) return;
+            console.log("messageUpdate")
+            if(args.args.author && args.args.author.id === clientId) return;
             return channel.send({embeds: [getMessageEditedEmbed(client, args)]})
         }
         case "messageDelete": {
+            console.log("messageDelete")
             if(!args.args.author) return;
             if(args.args.author.id === clientId) return;
             if(!args.args.content) return;
             return channel.send({embeds: [await getMessageDeletedEmbed(client, args.args)]})
         }
         case "guildMemberUpdate": {
+            console.log("guildMemberUpdate")
             return channel.send({embeds: [getRoleChangedEmbed(args)]})
         }
         case "nicknameChanged": {
+            console.log("nicknameChanged")
             return channel.send({embeds: [getNicknameChangedEmbed(args)]})
         }
         case "purge": {
+            console.log("purge")
             //user, channel, messageIDs, interaction
             return channel.send({embeds: [getPurgedEmbed(args)]})
         }
         case "userTimeouted": {
+            console.log("userTimeouted")
             //newMember, entry
             return channel.send({embeds: [getTimeoutedEmbed(args, "getimeouted")]})
         }
         case "userKicked": {
+            console.log("userKicked")
             return channel.send({embeds: [getTimeoutedEmbed(args, "gekickt")]})
 
         }
         case "userBanned": {
+            console.log("userBanned")
             return channel.send({embeds: [getTimeoutedEmbed(args, "gebannt")]})
 
         }
         case "botDetected": {
+            console.log("botDetected")
             return channel.send({embeds: [getBotEmbed(args)]})
 
         }
         case "inactivePurge": {
+            console.log("inactivePurge")
             return channel.send({embeds: [getInactivePurgedEmbed(args)]})
         }
         case "userLeft": {
+            console.log("userLeft")
+
             return hbChannel.send({embeds: [getUserLeftEmbed(args)]})
 
         }
@@ -95,7 +107,7 @@ function getPurgedEmbed(args) {
     }
 
     if(channel) {
-        embed.addField("Im Channel: ", channel.name);
+        embed.addField("Im Channel: ", `<#${channel.id}>`);
     }
 
     return embed;
@@ -115,12 +127,14 @@ function getMemberEmbed(member) {
 function getMessageEditedEmbed(client, args) {
     const oldMessage = args.args;
     const newMessage = args.newMessage;
-    const channelName = client.channels.cache.get(oldMessage.channelId).name;
+    const channel = client.channels.cache.get(oldMessage.channelId);
+    const channelName = channel.name;
+    console.log("Edited", newMessage);
 
     return new MessageEmbed()
         .setTitle(`${newMessage.author.username} <${newMessage.author.discriminator}> hat eine Nachricht bearbeitet`)
         .addFields(
-                { name: 'Channel:', value: channelName },
+                { name: 'Channel:', value: `<#${channel.id}>` },
                 { name: 'Zeitpunkt:', value: new Date(newMessage.editedTimestamp).toISOString()},
                 { name: "Alte Nachricht:", value: oldMessage.content ?? "_Ich war leider nicht da, als die alte Nachricht geschrieben wurde_" },
                 { name: 'Neue Nachricht:', value: newMessage.content }
@@ -129,11 +143,12 @@ function getMessageEditedEmbed(client, args) {
 
 
 async function getMessageDeletedEmbed(client, message) {    
-    const channelName = client.channels.cache.get(message.channelId).name;
+    const channel = client.channels.cache.get(message.channelId);
+    const channelName = channel.name;
     const embed = new MessageEmbed()
     .setTitle(`Es wurde eine Nachricht von ${message.author.username} <${message.author.discriminator}> gelöscht`)
     .addFields(
-            { name: 'Channel:', value: channelName },
+            { name: 'Channel:', value: `<#${channel.id}>` },
             { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
     );
     const entry = await message.guild.fetchAuditLogs().then(audit => audit.entries.first())
@@ -159,7 +174,7 @@ function getNicknameChangedEmbed(args) {
     let oldMemberName = args.args.nickname ?? args.args.user.username;
     let newMemberName = args.newMember.nickname ?? args.newMember.user.username;
     return new MessageEmbed()
-    .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat seinen Namen geändert.`)
+    .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Namen geändert.`)
     .addFields(
         { name: 'Alter Name:', value: oldMemberName },
         { name: 'Neuer Name:', value: newMemberName },

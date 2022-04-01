@@ -20,7 +20,7 @@ client.db.sync();
 
 client.activity = require('./activity.json');
 
-client.twitch = new Twitch();
+//client.twitch = new Twitch();
 
 
 

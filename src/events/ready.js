@@ -40,7 +40,7 @@ module.exports = {
 					if (joined < newDate) {
 						//
 						if (m.kickable) {
-							console.log(m);
+							console.log(m.user.username);
 							count++;
 							//  Enable KICK
 							//m.kick()
@@ -65,28 +65,30 @@ async function startInterval(client) {
 	let liveFlag = false;
 
 	return interval = setInterval(async function () {
+		if(client.twitch) {
+			client.twitch.isStreamLive("honeyball").then(stream => {
+				if(!liveFlag && stream) {
+					liveFlag = true;
+					let url = "https://twitch.tv/honeyball"
+					const twitchEmbed = new MessageEmbed()
+					.setColor('#0099ff')
+					.setTitle(stream.title)
+					.setURL(url)
+					.setAuthor({ name: stream.displayName, iconURL: stream.profilePic, url: url })
+					.addFields(
+						{ name: 'Game', value: `${stream.gameName}`, inline: true },
+						{ name: 'Viewers', value: `${stream.viewers}`, inline: true },
+					)
+					.setImage(stream.thumbnail)
+					.setTimestamp()		
+					channel.send({ content: twitchLiveMessage, embeds: [twitchEmbed] });
+				}
+				else if(liveFlag && !stream) {
+					liveFlag = false;
+				}
+			});
+		}
 		
-		client.twitch.isStreamLive("honeyball").then(stream => {
-			if(!liveFlag && stream) {
-				liveFlag = true;
-				let url = "https://twitch.tv/honeyball"
-				const twitchEmbed = new MessageEmbed()
-				.setColor('#0099ff')
-				.setTitle(stream.title)
-				.setURL(url)
-				.setAuthor({ name: stream.displayName, iconURL: stream.profilePic, url: url })
-				.addFields(
-					{ name: 'Game', value: `${stream.gameName}`, inline: true },
-					{ name: 'Viewers', value: `${stream.viewers}`, inline: true },
-				)
-				.setImage(stream.thumbnail)
-				.setTimestamp()		
-				channel.send({ content: twitchLiveMessage, embeds: [twitchEmbed] });
-			}
-			else if(liveFlag && !stream) {
-				liveFlag = false;
-			}
-		});
 		
 
 		client.db.autoMessageModel.findAll().then((messageList) => {

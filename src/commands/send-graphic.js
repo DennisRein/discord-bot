@@ -83,10 +83,6 @@ module.exports = {
 
         const attachment = new MessageAttachment(canvas.toBuffer(), 'graphic.png');
 
-
-
-        //console.log(interaction);
-        //interaction.channel.send({ files: [attachment] })
         interaction.reply({ files: [attachment] });
         
 	},

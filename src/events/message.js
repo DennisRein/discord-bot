@@ -9,8 +9,6 @@ module.exports = {
             return;
 
         if(message.guildId) {
-            let user = await fetchUserModel(client, message);
-
             client.db.messages.create({
                 id: message.id,
                 sender: message.author.id,
@@ -74,6 +72,10 @@ module.exports = {
         else {
             if(message.content.length < 15) return;
             let user = await fetchUserModel(client, message);
+
+            if(!user) {
+                return;
+            }
 
             if(!user.hasrole && user.activity >= 15000) {
                 fetchMember(client, message).roles.add(activityRole);
@@ -172,6 +174,11 @@ async function fetchUserModel(client, message) {
     if (user) {
         return user;
     }
+
+    if(!member) {
+        return null;
+    }
+
 
     user = await client.db.userModel.create({
         userid: userId,

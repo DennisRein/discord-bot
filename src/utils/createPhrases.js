@@ -4,8 +4,6 @@ module.exports = function writePhrases(client) {
 
     var json = JSON.stringify(client.phrases);
 
-    console.log(json);
-
     fs.writeFileSync(path, json, { flag: 'w' },)
 }
 
