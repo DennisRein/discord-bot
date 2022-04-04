@@ -22,7 +22,7 @@ module.exports = {
                     roles.push(role);
                 }
             });
-            writeLogMessage({ client: client, type: "guildMemberUpdate", args: added, roles, newMember });
+  //          writeLogMessage({ client: client, type: "guildMemberUpdate", args: added, roles, newMember });
         } else if (oldMember.roles.cache.size < newMember.roles.cache.size) {
             added = true;
             newMember.roles.cache.forEach(role => {
@@ -30,7 +30,7 @@ module.exports = {
                     roles.push(role);
                 }
             });
-            writeLogMessage({ client: client, type: "guildMemberUpdate", args: added, roles, newMember });
+//            writeLogMessage({ client: client, type: "guildMemberUpdate", args: added, roles, newMember });
         }
         },
 };
