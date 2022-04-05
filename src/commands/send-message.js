@@ -10,7 +10,7 @@ module.exports = {
                 .setName("channel")
                 .setDescription("In welchen Kanal möchtest du die Nachricht senden?")
                 .setRequired(true)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
+           
 
         }),
     async execute(interaction) {

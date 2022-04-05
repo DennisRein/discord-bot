@@ -31,7 +31,7 @@ module.exports = {
         const user = await interaction.client.users.fetch(userid).catch(console.error);
 
         try {
-            user.send(interaction.options.get("message").value);
+            await user.send(interaction.options.get("message").value);
             interaction.reply("Send")
         }
         catch(e) {
