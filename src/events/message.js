@@ -18,7 +18,7 @@ module.exports = {
                 
             });
 
-            badPhraseTest(client, message);
+            //badPhraseTest(client, message);
 
             botTest(client, message);
         }

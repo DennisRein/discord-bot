@@ -38,7 +38,8 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
         }
         case "nicknameChanged": {
             console.log("nicknameChanged")
-            return channel.send({embeds: [getNicknameChangedEmbed(args)]})
+            if( args.args.user.username !== args.newMember.user.username)
+                return channel.send({embeds: [getNicknameChangedEmbed(args)]})
         }
         case "purge": {
             console.log("purge")
@@ -80,7 +81,7 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
 
 function getUserLeftEmbed(args) {
     return new MessageEmbed()
-        .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Server verlassen`)
+        .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Server verlassen ${args.args.user.bot ? "war ein **bot**" : ""}` )
     }
 
 function getInactivePurgedEmbed(args) {
@@ -124,7 +125,7 @@ function getPurgedEmbed(args) {
 
 function getMemberEmbed(member) {
     return new MessageEmbed()
-        .setTitle("Ein neuer User ist beigetreten:")
+        .setTitle(`Ein neuer User ist beigetreten: ${member.user.bot ? "war ein **bot**" : ""}`)
         .addFields(
                 { name: "Name", value: member.user.username + `<${member.user.discriminator}>` },
                 { name: 'Beigetreten:', value: new Date(member.joinedTimestamp).toISOString() },
@@ -226,11 +227,13 @@ async function getMessageDeletedEmbed(client, message) {
 
 function getRoleChangedEmbed(args) {
     let user = args.newMember.user;
-    return new MessageEmbed()
-    .setTitle(`${user.username} <${user.discriminator}> eine Rolle wurde ${args.args ? "hinzugefügt" : "entfernt"}.`)
-    .addFields(
-            { name: 'Rolle:', value: args.roles[0].name },
-    );
+    let embed =  new MessageEmbed();
+    embed.setTitle(`${user.username} <${user.discriminator}> eine Rolle wurde ${args.args ? "hinzugefügt" : "entfernt"}.`)
+    for(let r of args.roles) {
+        embed.addField('Rolle:', r.name)
+    }
+
+    return embed;
 }
 
 function getNicknameChangedEmbed(args) {

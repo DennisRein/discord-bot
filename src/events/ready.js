@@ -126,10 +126,9 @@ async function startInterval(client) {
 					let channel = await guild.channels.fetch(channelid);
 					let message = await channel.messages.fetch(messageid);
 					
-					console.log("Removing timed roles")
-					console.log(e.userid, client.user.id);
 					if (now >= e.loseroleafter && e.userid && e.userid !== client.user.id) {
-						console.log("Removed user: ", e.userid)
+						console.log("Removed user from grumpycat role: ", e.userid)
+						console.log("Bot id: ", client.user.id)
 						message.reactions.resolve(reaction).users.remove(userid);
 						member.roles.remove(roleid);
 						client.db.timedRolesModel.destroy({ where: { userid: userid } });	
