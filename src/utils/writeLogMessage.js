@@ -11,7 +11,6 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
     switch(type) {
         case "guildMemberAdd": {
             console.log("guildMemberAdd")
-            if(args.args.bot)
             return hbChannel.send({embeds: [getMemberEmbed(args.args)]});
         }
         case "messageUpdate": {
@@ -81,7 +80,7 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
 
 function getUserLeftEmbed(args) {
     return new MessageEmbed()
-        .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Server verlassen`)
+        .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Server verlassen ${args.args.user.bot ? "war ein **bot**" : ""}` )
     }
 
 function getInactivePurgedEmbed(args) {
@@ -125,7 +124,7 @@ function getPurgedEmbed(args) {
 
 function getMemberEmbed(member) {
     return new MessageEmbed()
-        .setTitle("Ein neuer User ist beigetreten:")
+        .setTitle(`Ein neuer User ist beigetreten: ${member.user.bot ? "war ein **bot**" : ""}`)
         .addFields(
                 { name: "Name", value: member.user.username + `<${member.user.discriminator}>` },
                 { name: 'Beigetreten:', value: new Date(member.joinedTimestamp).toISOString() },

@@ -37,5 +37,5 @@ module.exports = {
                 writeLogMessage({ client: client, type: "guildMemberUpdate", args: false, roles, newMember });
             }
         }
-        },
+    },
 };
