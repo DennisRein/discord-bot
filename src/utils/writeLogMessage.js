@@ -38,7 +38,8 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
         }
         case "nicknameChanged": {
             console.log("nicknameChanged")
-            return channel.send({embeds: [getNicknameChangedEmbed(args)]})
+            if( args.args.user.username !== args.newMember.user.username)
+                return channel.send({embeds: [getNicknameChangedEmbed(args)]})
         }
         case "purge": {
             console.log("purge")
