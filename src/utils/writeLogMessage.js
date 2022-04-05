@@ -11,6 +11,7 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
     switch(type) {
         case "guildMemberAdd": {
             console.log("guildMemberAdd")
+            if(args.args.bot)
             return hbChannel.send({embeds: [getMemberEmbed(args.args)]});
         }
         case "messageUpdate": {
@@ -226,11 +227,13 @@ async function getMessageDeletedEmbed(client, message) {
 
 function getRoleChangedEmbed(args) {
     let user = args.newMember.user;
-    return new MessageEmbed()
-    .setTitle(`${user.username} <${user.discriminator}> eine Rolle wurde ${args.args ? "hinzugefügt" : "entfernt"}.`)
-    .addFields(
-            { name: 'Rolle:', value: args.roles[0].name },
-    );
+    let embed =  new MessageEmbed();
+    embed.setTitle(`${user.username} <${user.discriminator}> eine Rolle wurde ${args.args ? "hinzugefügt" : "entfernt"}.`)
+    for(let r of args.roles) {
+        embed.addField('Rolle:', r.name)
+    }
+
+    return embed;
 }
 
 function getNicknameChangedEmbed(args) {

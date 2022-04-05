@@ -12,25 +12,30 @@ module.exports = {
 
             return;
         }
+
         if(oldMember.nickname !== newMember.nickname && entry.changes && entry.changes[0] && entry.changes[0].key === 'nick') return writeLogMessage({client: client, type: "nicknameChanged", args: oldMember, newMember});
         
-        let roles = [];
-        let added = false;
-        if (oldMember.roles.cache.size > newMember.roles.cache.size) {
-            oldMember.roles.cache.forEach(role => {
-                if (!newMember.roles.cache.has(role.id)) {
-                    roles.push(role);
+        if(entry.action === "MEMBER_ROLE_UPDATE")
+        {
+            if(entry.changes[0].key === "$add") {
+
+                roles = entry.changes[0].new;
+                let str = "";
+                for(let i in entry.changes[0].new) {
+                    str = i.name + " ";
                 }
-            });
-            writeLogMessage({ client: client, type: "guildMemberUpdate", args: added, roles, newMember });
-        } else if (oldMember.roles.cache.size < newMember.roles.cache.size) {
-            added = true;
-            newMember.roles.cache.forEach(role => {
-                if (!oldMember.roles.cache.has(role.id)) {
-                    roles.push(role);
+                console.log(entry.changes[0].new);
+                writeLogMessage({ client: client, type: "guildMemberUpdate", args: true, roles, newMember });
+            }
+            if(entry.changes[0].key === "$remove") {
+                roles = entry.changes[0].new;
+                let str = "";
+                for(let i in entry.changes[0].new) {
+                    str = i.name + " ";
                 }
-            });
-            writeLogMessage({ client: client, type: "guildMemberUpdate", args: added, roles, newMember });
+                console.log(entry.changes[0].new);
+                writeLogMessage({ client: client, type: "guildMemberUpdate", args: false, roles, newMember });
+            }
         }
         },
 };
