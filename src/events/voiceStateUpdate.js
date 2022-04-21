@@ -9,7 +9,7 @@ module.exports = {
         }
         const { voiceRole } = client.config;
         if(!oldState.channelId) {
-            if(newState.channel.type === 'GUILD_VOICE') {
+            if(newState.channel.type === 'GUILD_VOICE' || newState.channel.type === 'GUILD_STAGE_VOICE') {
                 newState.member.roles.add(voiceRole);
             }
         }

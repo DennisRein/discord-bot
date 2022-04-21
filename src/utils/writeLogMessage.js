@@ -18,6 +18,8 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             if(args.args.author && args.args.author.id === clientId) return;
             const oldMessage = args.args;
             const newMessage = args.newMessage;
+            if(oldMessage.content === newMessage.content) return;
+	    if(!oldMessage.content || !newMessage.content) return;
             if(oldMessage.content.length + newMessage.content.length > 5500) {
                 channel.send({embeds: [getSingleMessageUpdateEmbed(client, args, false)]})
                 return channel.send({embeds: [getSingleMessageUpdateEmbed(client, args, true)]})
@@ -86,7 +88,7 @@ function getUserLeftEmbed(args) {
 
 function getInactivePurgedEmbed(args) {
     return new MessageEmbed()
-        .setTitle(`Ich hätte ${args.args} Benutzer vom Server entfernt die nach zwei Wochen keine Rolle erhalten haben. Die Kickfunktion ist jedoch noch temporär deaktiviert um die entdeckte Anzahl zu prüfen.`)
+        .setTitle(`Ich habe ${args.args} Benutzer vom Server entfernt die nach zwei Wochen keine Rolle erhalten haben.`)
     }
 
 function getBotEmbed(args) {
@@ -216,7 +218,7 @@ async function getMessageDeletedEmbed(client, message) {
             { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
     );
     const entry = await message.guild.fetchAuditLogs().then(audit => audit.entries.first())
-    if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE') {
+    if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE' && entry.target.id === message.author.id) {
         embed.addField("Gelöscht von:", `${entry.executor.username} <${entry.executor.discriminator}>`)
     }
 

@@ -11,7 +11,10 @@ module.exports = {
                         let guild = await client.guilds.fetch(guildId)
                         let member = await guild.members.fetch(user.id);
                         if (!member.roles.cache.find(r => modRoles.includes(r.id)))
+                        {
                                 reaction.users.remove(user.id);
+                                console.log(`${user}`)
+                        }
                 }
                 try {
                         const { d } = require("../reaction-config.json");
