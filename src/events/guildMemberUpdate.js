@@ -7,6 +7,9 @@ module.exports = {
             return; 
         }
         const entry = await newMember.guild.fetchAuditLogs().then(audit => audit.entries.first())
+
+        if(entry.target.id !== oldMember.user.id) return;
+
         if(entry.actionType === 'UPDATE' && entry.changes[0].key === 'communication_disabled_until' && entry.target.id === oldMember.user.id) {
             writeLogMessage({ client: client, type: "userTimeouted", args: newMember, entry })
 
@@ -15,7 +18,7 @@ module.exports = {
 
         if(oldMember.nickname !== newMember.nickname && entry.changes && entry.changes[0] && entry.changes[0].key === 'nick') return writeLogMessage({client: client, type: "nicknameChanged", args: oldMember, newMember});
         
-        if(entry.action === "MEMBER_ROLE_UPDATE")
+        if(entry.action === "MEMBER_ROLE_UPDATE" )
         {
             if(entry.changes[0].key === "$add") {
 
@@ -24,7 +27,6 @@ module.exports = {
                 for(let i in entry.changes[0].new) {
                     str = i.name + " ";
                 }
-                console.log(entry.changes[0].new);
                 writeLogMessage({ client: client, type: "guildMemberUpdate", args: true, roles, newMember });
             }
             if(entry.changes[0].key === "$remove") {
@@ -33,7 +35,6 @@ module.exports = {
                 for(let i in entry.changes[0].new) {
                     str = i.name + " ";
                 }
-                console.log(entry.changes[0].new);
                 writeLogMessage({ client: client, type: "guildMemberUpdate", args: false, roles, newMember });
             }
         }

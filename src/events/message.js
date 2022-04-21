@@ -77,7 +77,7 @@ module.exports = {
                 return;
             }
 
-            if(!user.hasrole && user.activity >= 15000) {
+            if(hasRole(message, activityRole) === undefined && user.activity >= 15000) {
                 fetchMember(client, message).roles.add(activityRole);
                 await client.db.userModel.update({ hasrole: 1 }, { where: { id: user.id } });
             }
@@ -90,6 +90,11 @@ module.exports = {
         }
 	},
 };
+
+function hasRole(message, activityRole) {
+    console.log(message.member.roles.cache.find(r => r.id === activityRole));
+    return message.member.roles.cache.find(r => r.id === activityRole)
+}
 
 async function badPhraseTest(client, message) {
     let txt = message.content;
