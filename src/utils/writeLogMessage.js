@@ -18,6 +18,8 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             if(args.args.author && args.args.author.id === clientId) return;
             const oldMessage = args.args;
             const newMessage = args.newMessage;
+            if(oldMessage.content === newMessage.content) return;
+	    if(!oldMessage.content || !newMessage.content) return;
             if(oldMessage.content.length + newMessage.content.length > 5500) {
                 channel.send({embeds: [getSingleMessageUpdateEmbed(client, args, false)]})
                 return channel.send({embeds: [getSingleMessageUpdateEmbed(client, args, true)]})
@@ -86,20 +88,23 @@ function getUserLeftEmbed(args) {
 
 function getInactivePurgedEmbed(args) {
     return new MessageEmbed()
-        .setTitle(`Ich hätte ${args.args} Benutzer vom Server entfernt die nach zwei Wochen keine Rolle erhalten haben. Die Kickfunktion ist jedoch noch temporär deaktiviert um die entdeckte Anzahl zu prüfen.`)
+        .setTitle(`Ich habe ${args.args} Benutzer vom Server entfernt die nach zwei Wochen keine Rolle erhalten haben.`)
     }
 
 function getBotEmbed(args) {
     return new MessageEmbed()
         .setTitle(`${args.message.author.username} <${args.message.author.discriminator}> wurde von mir gekickt.`)
+        .addField("Ziel", `${args.message.author}`)
         .addField("Grund", "Verdacht auf Bot")
         .addField("Nachricht", args.message.content)
     }
 
 function getTimeoutedEmbed(args, type) {
-    return new MessageEmbed()
-        .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> wurde von ${args.entry.executor.username} <${args.entry.executor.discriminator}> ${type}.`)
-
+    let embed = new MessageEmbed();
+    embed.setTitle(`Benutzer ${type}`);
+    embed.addField("Benutzer:", `${args.args.user}`)
+    embed.addField("Von:", `${args.entry.executor}`)
+    return embed;
 }
 
 function getPurgedEmbed(args) {
@@ -108,8 +113,9 @@ function getPurgedEmbed(args) {
     let amount = args.messageIDs.length;
     let sender = args.interaction.user;
     let embed = new MessageEmbed()
-        .setTitle(`${sender.username} hat ${amount} Nachrichten gepurged.`)
-        
+        .setTitle(`Nachrichten purged.`)
+
+    embed.addField("Von:", `${sender}`)
     if(user) {
         embed.addField("Vom Nutzer: ", `${user.username} <${user.discriminator}>`);
     }
@@ -125,9 +131,9 @@ function getPurgedEmbed(args) {
 
 function getMemberEmbed(member) {
     return new MessageEmbed()
-        .setTitle(`Ein neuer User ist beigetreten: ${member.user.bot ? "war ein **bot**" : ""}`)
+        .setTitle(`Ein User ist beigetreten: ${member.user.bot ? "war ein **bot**" : ""}`)
         .addFields(
-                { name: "Name", value: member.user.username + `<${member.user.discriminator}>` },
+                { name: "Name", value: `${member.user}` },
                 { name: 'Beigetreten:', value: new Date(member.joinedTimestamp).toISOString() },
         );
 }
@@ -146,7 +152,8 @@ function getSingleMessageUpdateEmbed(client, args, isNew) {
     const channelName = channel.name;
 
     let embed = new MessageEmbed();
-    embed.setTitle(`${msg.author.username} <${msg.author.discriminator}> hat eine Nachricht bearbeitet`)
+    embed.setTitle('Nachricht bearbeitet')
+    embed.addField('Von', `${msg.author}`)
     embed.addFields(
             { name: 'Channel:', value: `<#${channel.id}>` },
             { name: 'Zeitpunkt:', value: new Date(msg.editedTimestamp).toISOString()},
@@ -173,7 +180,8 @@ function getMessageEditedEmbed(client, args) {
     const channelName = channel.name;
 
     let embed = new MessageEmbed();
-    embed.setTitle(`${newMessage.author.username} <${newMessage.author.discriminator}> hat eine Nachricht bearbeitet`)
+    embed.setTitle(`Nachricht bearbeitet`)
+    embed.addField('Von', `${newMessage.author}`)
     embed.addFields(
             { name: 'Channel:', value: `<#${channel.id}>` },
             { name: 'Zeitpunkt:', value: new Date(newMessage.editedTimestamp).toISOString()},
@@ -210,14 +218,16 @@ async function getMessageDeletedEmbed(client, message) {
     const channel = client.channels.cache.get(message.channelId);
     const channelName = channel.name;
     const embed = new MessageEmbed()
-    .setTitle(`Es wurde eine Nachricht von ${message.author.username} <${message.author.discriminator}> gelöscht`)
+    .setTitle(`Nachricht gelöscht`)
     .addFields(
+
+            { name: 'Von:', value: `${message.author}` },
             { name: 'Channel:', value: `<#${channel.id}>` },
             { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
     );
     const entry = await message.guild.fetchAuditLogs().then(audit => audit.entries.first())
-    if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE') {
-        embed.addField("Gelöscht von:", `${entry.executor.username} <${entry.executor.discriminator}>`)
+    if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE' && entry.target.id === message.author.id) {
+        embed.addField("Gelöscht von:", `${entry.executor}`)
     }
 
     return embed;
@@ -228,7 +238,8 @@ async function getMessageDeletedEmbed(client, message) {
 function getRoleChangedEmbed(args) {
     let user = args.newMember.user;
     let embed =  new MessageEmbed();
-    embed.setTitle(`${user.username} <${user.discriminator}> eine Rolle wurde ${args.args ? "hinzugefügt" : "entfernt"}.`)
+    embed.setTitle(`Rolle ${args.args ? "hinzugefügt" : "entfernt"}.`)
+    embed.addField('Von:', `${user}`)
     for(let r of args.roles) {
         embed.addField('Rolle:', r.name)
     }
@@ -242,8 +253,9 @@ function getNicknameChangedEmbed(args) {
     console.log("Old Member Name: ", args.args.nickname, args.args.user.username)
     console.log("New Member Name: ", args.newMember.nickname, args.newMember.user.username)
     return new MessageEmbed()
-    .setTitle(`${args.args.user.username} <${args.args.user.discriminator}> hat den Namen geändert.`)
+    .setTitle(`Nickname Änderung.`)
     .addFields(
+        { name: 'Von:', value: `${args.args.user}` },
         { name: 'Alter Name:', value: oldMemberName },
         { name: 'Neuer Name:', value: newMemberName },
     );

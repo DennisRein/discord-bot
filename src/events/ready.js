@@ -39,10 +39,11 @@ module.exports = {
 					var newDate = moment(Date.now()).add(`-${purgeInterval}`, 'days').toDate();
 					if (joined < newDate) {
 						//
-						if (m.kickable) {
+						if (m.kickable && count <= 100) {
 							console.log(m.user.username);
+							console.log(joined)
+							console.log(newDate)
 							count++;
-							//  Enable KICK
 							//m.kick()
 						}
 					}
