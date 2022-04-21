@@ -1,4 +1,4 @@
-# Mogel-Bot
+# Axobotl
 The Igelbau-Discord Servers own bot handling everything you can imagine and more.
 
 To run this bot make sure to:
