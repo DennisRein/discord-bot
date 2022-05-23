@@ -92,7 +92,6 @@ module.exports = {
 };
 
 function hasRole(message, activityRole) {
-    console.log(message.member.roles.cache.find(r => r.id === activityRole));
     return message.member.roles.cache.find(r => r.id === activityRole)
 }
 
@@ -156,6 +155,7 @@ async function botTest(client, message) {
         for(let msg of msgs) {
             deleteMessage(client, msg.channel, msg.id);
         }
+        memeber.timeout(12 * 60 * 60 * 1000)
         if(!member.kickable) return console.log("I cannot kick this member!");
         
         member.timeout(12 * 60 * 60 * 1000)
