@@ -39,9 +39,10 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             return channel.send({embeds: [getRoleChangedEmbed(args)]})
         }
         case "nicknameChanged": {
-            console.log("nicknameChanged")
+            console.log("nicknameChanged", args.args.user.usernam,  args.newMember.user.username)
             if( args.args.user.username !== args.newMember.user.username)
                 return channel.send({embeds: [getNicknameChangedEmbed(args)]})
+            break;
         }
         case "purge": {
             console.log("purge")
@@ -65,6 +66,7 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
         }
         case "botDetected": {
             console.log("botDetected")
+            channel.send(`<@541051990697050132>`)
             return channel.send({embeds: [getBotEmbed(args)]})
 
         }
@@ -93,7 +95,7 @@ function getInactivePurgedEmbed(args) {
 
 function getBotEmbed(args) {
     return new MessageEmbed()
-        .setTitle(`${args.message.author.username} <${args.message.author.discriminator}> wurde von mir gekickt.`)
+        .setTitle(`${args.message.author.username} <${args.message.author.discriminator}> wurde von mir getimeouted.`)
         .addField("Ziel", `${args.message.author}`)
         .addField("Grund", "Verdacht auf Bot")
         .addField("Nachricht", args.message.content)
@@ -103,6 +105,7 @@ function getTimeoutedEmbed(args, type) {
     let embed = new MessageEmbed();
     embed.setTitle(`Benutzer ${type}`);
     embed.addField("Benutzer:", `${args.args.user}`)
+    embed.addField("Name:", `${args.args.user.username} <${args.args.user.discriminator}>`)
     embed.addField("Von:", `${args.entry.executor}`)
     return embed;
 }
@@ -133,7 +136,8 @@ function getMemberEmbed(member) {
     return new MessageEmbed()
         .setTitle(`Ein User ist beigetreten: ${member.user.bot ? "war ein **bot**" : ""}`)
         .addFields(
-                { name: "Name", value: `${member.user}` },
+            { name: "Benutzer", value: `${member.user}` },
+            { name: "Name", value: member.user.username + `<${member.user.discriminator}>` },
                 { name: 'Beigetreten:', value: new Date(member.joinedTimestamp).toISOString() },
         );
 }
@@ -153,7 +157,7 @@ function getSingleMessageUpdateEmbed(client, args, isNew) {
 
     let embed = new MessageEmbed();
     embed.setTitle('Nachricht bearbeitet')
-    embed.addField('Von', `${msg.author}`)
+    embed.addField('Von', `${msg.author} ${msg.author.username} <${msg.author.discriminator}>`)
     embed.addFields(
             { name: 'Channel:', value: `<#${channel.id}>` },
             { name: 'Zeitpunkt:', value: new Date(msg.editedTimestamp).toISOString()},
@@ -181,7 +185,7 @@ function getMessageEditedEmbed(client, args) {
 
     let embed = new MessageEmbed();
     embed.setTitle(`Nachricht bearbeitet`)
-    embed.addField('Von', `${newMessage.author}`)
+    embed.addField('Von', `${newMessage.author} ${newMessage.author.username} <${newMessage.author.discriminator}>`)
     embed.addFields(
             { name: 'Channel:', value: `<#${channel.id}>` },
             { name: 'Zeitpunkt:', value: new Date(newMessage.editedTimestamp).toISOString()},
@@ -221,10 +225,21 @@ async function getMessageDeletedEmbed(client, message) {
     .setTitle(`Nachricht gelöscht`)
     .addFields(
 
-            { name: 'Von:', value: `${message.author}` },
+        { name: 'Benutzer:', value: `${message.author}` },
+        { name: 'Name:', value: `${message.author.username} <${message.author.discriminator}>` },
             { name: 'Channel:', value: `<#${channel.id}>` },
-            { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
     );
+    if(message.content.length > 1023) {
+        let msgs = trimMessages(message.content)
+        let i = 1;
+        for(let msg of msgs) {
+            embed.addField(`Neue Nachricht Part ${i}`, msg)
+            i++;
+        }
+    }
+    else {
+        embed.addField("Nachricht:", message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_")
+    }
     const entry = await message.guild.fetchAuditLogs().then(audit => audit.entries.first())
     if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE' && entry.target.id === message.author.id) {
         embed.addField("Gelöscht von:", `${entry.executor}`)
@@ -239,7 +254,8 @@ function getRoleChangedEmbed(args) {
     let user = args.newMember.user;
     let embed =  new MessageEmbed();
     embed.setTitle(`Rolle ${args.args ? "hinzugefügt" : "entfernt"}.`)
-    embed.addField('Von:', `${user}`)
+    embed.addField('Benutzer:', `${user}`)
+    embed.addField('Name:', `${user.username} <${user.discriminator}>`)
     for(let r of args.roles) {
         embed.addField('Rolle:', r.name)
     }

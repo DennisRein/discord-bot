@@ -13,7 +13,6 @@ module.exports = {
                         if (!member.roles.cache.find(r => modRoles.includes(r.id)))
                         {
                                 reaction.users.remove(user.id);
-                                console.log(`${user}`)
                         }
                 }
                 try {
