@@ -39,9 +39,10 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
             return channel.send({embeds: [getRoleChangedEmbed(args)]})
         }
         case "nicknameChanged": {
-            console.log("nicknameChanged")
+            console.log("nicknameChanged", args.args.user.usernam,  args.newMember.user.username)
             if( args.args.user.username !== args.newMember.user.username)
                 return channel.send({embeds: [getNicknameChangedEmbed(args)]})
+            break;
         }
         case "purge": {
             console.log("purge")
@@ -223,8 +224,18 @@ async function getMessageDeletedEmbed(client, message) {
 
             { name: 'Von:', value: `${message.author}` },
             { name: 'Channel:', value: `<#${channel.id}>` },
-            { name: "Nachricht:", value: message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_" },
     );
+    if(message.content.length > 1023) {
+        let msgs = trimMessages(message.content)
+        let i = 1;
+        for(let msg of msgs) {
+            embed.addField(`Neue Nachricht Part ${i}`, msg)
+            i++;
+        }
+    }
+    else {
+        embed.addField("Nachricht:", message.content ?? "_Ich war leider nicht da, als die Nachricht geschrieben wurde_")
+    }
     const entry = await message.guild.fetchAuditLogs().then(audit => audit.entries.first())
     if(entry.actionType === 'DELETE' && entry.targetType ===  'MESSAGE' && entry.target.id === message.author.id) {
         embed.addField("Gelöscht von:", `${entry.executor}`)

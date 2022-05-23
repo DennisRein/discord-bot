@@ -92,7 +92,6 @@ module.exports = {
 };
 
 function hasRole(message, activityRole) {
-    console.log(message.member.roles.cache.find(r => r.id === activityRole));
     return message.member.roles.cache.find(r => r.id === activityRole)
 }
 

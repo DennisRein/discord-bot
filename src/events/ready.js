@@ -41,8 +41,6 @@ module.exports = {
 						//
 						if (m.kickable && count <= 100) {
 							console.log(m.user.username);
-							console.log(joined)
-							console.log(newDate)
 							count++;
 							//m.kick()
 						}
