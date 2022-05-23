@@ -25,7 +25,7 @@ module.exports = class MessageHelper {
         if(amount) {
             return await this.client.db.messagesModel.findAll({
                 limit: amount ,
-                order: 'timestamp DESC',
+                order: [['timestamp', 'DESC']],
                 where: {sender: userId}})
             
 
