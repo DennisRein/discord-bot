@@ -21,7 +21,15 @@ module.exports = class MessageHelper {
         return await this.client.db.messagesModel.findAll({where: {channel: channel.id}})
     }
 
-    async fetchMessagesByUser(userId) {
+    async fetchMessagesByUser(userId, amount) {
+        if(amount) {
+            return await this.client.db.messagesModel.findAll({
+                limit: amount ,
+                order: 'timestamp DESC',
+                where: {sender: userId}})
+            
+
+        }
         return await this.client.db.messagesModel.findAll({where: {sender: userId}})
     }
 

@@ -126,12 +126,12 @@ function clearMessage(client, message) {
 async function botTest(client, message) {
     const writeLogMessage = require("../utils/writeLogMessage.js");
 
-    let msgs = await client.messageHelper.fetchLastMessagesByUserInInterval(message.author.id, 10);
-
-    let threshold = 3; 
+    let threshold = 4; 
     let channels = {};
     let equalMessages = {};
     let messageIds = [];
+    let msgs = await client.messageHelper.fetchMessagesByUser(message.author.id, threshold);
+
 
 
     for(msg of msgs) {
@@ -157,6 +157,8 @@ async function botTest(client, message) {
             deleteMessage(client, msg.channel, msg.id);
         }
         if(!member.kickable) return console.log("I cannot kick this member!");
+        
+        member.timeout(12 * 60 * 60 * 1000)
         // TODO: Enable KICK
         //member.kick();
     }
