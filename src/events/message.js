@@ -125,12 +125,11 @@ function clearMessage(client, message) {
 async function botTest(client, message) {
     const writeLogMessage = require("../utils/writeLogMessage.js");
 
-    let msgs = await client.messageHelper.fetchMessagesByUser(message.author.id);
-
-    let threshold = 5; 
+    let threshold = 4; 
     let channels = {};
     let equalMessages = {};
     let messageIds = [];
+    let msgs = await client.messageHelper.fetchMessagesByUser(message.author.id, threshold);
 
 
     for(msg of msgs) {
@@ -148,15 +147,16 @@ async function botTest(client, message) {
             equalMessages[msg.message] = 1;
         }
     }
-    if(equalMessages[msg.message] > threshold && Object.keys(channels).length > threshold) {
+    if(equalMessages[msg.message] >= threshold && Object.keys(channels).length >= threshold) {
         writeLogMessage({client: client, type: "botDetected", args: msgs, message});
 
         let member = fetchMember(client, message);
         for(let msg of msgs) {
             deleteMessage(client, msg.channel, msg.id);
         }
-        memeber.timeout(12 * 60 * 60 * 1000)
         if(!member.kickable) return console.log("I cannot kick this member!");
+        
+        member.timeout(12 * 60 * 60 * 1000)
         // TODO: Enable KICK
         //member.kick();
     }
@@ -165,8 +165,12 @@ async function botTest(client, message) {
 
 async function deleteMessage(client, channelId, messageId) {
     let channel = await client.channels.fetch(channelId);
-    let message = await channel.messages.fetch(messageId);
-    message.delete();
+    try {
+        let message = await channel.messages.fetch(messageId);
+        message.delete();
+    } catch(e) {
+        console.log("Message can't be deleted");
+    }
 }
 
 async function fetchUserModel(client, message) {
