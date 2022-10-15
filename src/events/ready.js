@@ -42,7 +42,7 @@ module.exports = {
 						if (m.kickable && count <= 100) {
 							console.log(m.user.username);
 							count++;
-							//m.kick()
+							m.kick();
 						}
 					}
 				}
