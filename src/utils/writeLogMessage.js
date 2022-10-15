@@ -66,7 +66,7 @@ module.exports = async function writeLogMessage({client, type, ...args}) {
         }
         case "botDetected": {
             console.log("botDetected")
-            channel.send(`<@&837507726962720798>`)
+            channel.send(`<@&541051990697050132>`)
             return channel.send({embeds: [getBotEmbed(args)]})
 
         }

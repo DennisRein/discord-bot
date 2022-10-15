@@ -8,7 +8,7 @@ module.exports = {
         }
         const entry = await newMember.guild.fetchAuditLogs().then(audit => audit.entries.first())
 
-        if(entry.target.id !== oldMember.user.id) return;
+        if((entry.target && oldMember.user) && entry.target.id !== oldMember.user.id) return;
 
         if(entry.actionType === 'UPDATE' && entry.changes[0].key === 'communication_disabled_until' && entry.target.id === oldMember.user.id) {
             writeLogMessage({ client: client, type: "userTimeouted", args: newMember, entry })
