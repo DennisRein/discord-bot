@@ -6,7 +6,7 @@ To run this bot make sure to:
 - Update the config.json file
 - install the latest version of npm
 - run `npm install`
-- run npm run deploy-commands
+- cd
 - run node .
 
 ## Check the issues

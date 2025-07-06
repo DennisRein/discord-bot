@@ -1,5 +1,4 @@
-const { SlashCommandBuilder, ChannelType } = require('@discordjs/builders');
-const { MessageActionRow, MessageSelectMenu, Constants } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -17,48 +16,35 @@ module.exports = {
                 .setRequired(true)
         ),
     async execute(interaction) {
-        if(!interaction.client.memberHasPermission(interaction.member)) {
-			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
-			return; 
-		}
-        if(!interaction.client.configExists()) {
-			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
-			return; 
-		}
+        if (!interaction.client.memberHasPermission(interaction.member)) {
+            await interaction.reply({
+                content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.',
+                flags: 64 // ephemeral
+            });
+            return;
+        }
+        if (!interaction.client.configExists()) {
+            await interaction.reply({
+                content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!',
+                flags: 64
+            });
+            return;
+        }
 
-        let userid = interaction.options.get("user").value;
-
-        const user = await interaction.client.users.fetch(userid).catch(console.error);
+        const user = interaction.options.getUser('user');
+        const message = interaction.options.getString('message');
 
         try {
-            await user.send(interaction.options.get("message").value);
-            interaction.reply("Send")
-        }
-        catch(e) {
-            interaction.reply("Es gab ein Problem beim Senden, der Benutzer erlaubt wahrscheinlich keine DMs")
-
-        }
-        /*let botMessage = "Antworte bitte auf diese Nachricht mit der Nachricht die du senden willst, du hast eine Minute Zeit: ";
-		await interaction.reply({ content: botMessage, fetchReply: true }).then(message => {
-  
-            const SECONDS_TO_REPLY = 60 // replace 60 with how long to wait for message(in seconds).
-            const MESSAGES_TO_COLLECT = 1
-            const filter = (m) => m.author.id == interaction.user.id
-            const collector = interaction.channel.createMessageCollector({filter, time: SECONDS_TO_REPLY * 1000, max: MESSAGES_TO_COLLECT})
-            collector.on('end', collected => {
-                if (collected.size <= 0) {
-                    interaction.deleteReply();
-                    
-                }
+            await user.send(message);
+            await interaction.reply({
+                content: "Nachricht erfolgreich gesendet.",
+                flags: 64
             });
-            collector.on('collect', collected => {
-                channel.send(collected.content);
-                interaction.followUp(`Nachricht wurde in den channel: ${channel.name} gesendet.`);
-            })
-        });*/
-
-
-
-
+        } catch (e) {
+            await interaction.reply({
+                content: "Es gab ein Problem beim Senden – der Benutzer erlaubt wahrscheinlich keine DMs.",
+                flags: 64
+            });
+        }
     },
 };

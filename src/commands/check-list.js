@@ -1,37 +1,43 @@
-const { SlashCommandBuilder, ChannelType } = require('@discordjs/builders');
-const { MessageEmbed, MessageSelectMenu, Constants } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('checklist')
-        .setDescription('Zeig an was so möglich ist.'),
+        .setDescription('Zeig an, was so möglich ist.'),
     async execute(interaction) {
-        if(!interaction.client.memberHasPermission(interaction.member)) {
-			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
-			return; 
-		}
-        if(!interaction.client.configExists()) {
-			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
-			return; 
-		}
+        if (!interaction.client.memberHasPermission(interaction.member)) {
+            await interaction.reply({
+                content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.',
+                flags: 64 // Ephemeral
+            });
+            return;
+        }
+        if (!interaction.client.configExists()) {
+            await interaction.reply({
+                content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!',
+                flags: 64 // Ephemeral
+            });
+            return;
+        }
 
-        let embed = new MessageEmbed();
-        embed.setTitle("Was du ausprobieren kannst");
-        embed.setDescription('Alle Befehle kommen mit multiplen optionalen und benötigten Befehlen, welche die Effekte der Commands beeinflussen.')
-        embed.addField('Schau dir alle Befehle an', '/help');
-        embed.addField('Sende eine Nachricht über den Bot', '/send-message');
-        embed.addField('Editiere Nachrichten vom Bot', '/edit-message');
-        embed.addField('Schaue dir die Rollen an die du automatisch bekommst',
-                        'Im Voice, in der Faultierhalle, bei Aktivität');
-        embed.addField('Erstelle eine Nachricht, welche in einem Intervall gesendet wird', '/add-automatic-message');
-        embed.addField('Schau dir alle aktiven automatischen Nachrichten an und bearbeite diese', '/show-automatic-messages, /edit-automatic-message')
-        embed.addField('Entferne nicht mehr gebrauchte automatische Nachrichten', '/remove-automatic-message');
-        embed.addField('Erstelle eine Reaction-Role Nachricht, mit welcher User eine Rolle bei Reaction bekommen', '/add-reaction-role-message');
-        embed.addField('Schreibe dem Bot eine private Nachricht um den Wunschbrunnen zu erkunden', 'Und antworte auf die Nachricht mit dem /reply-to-message Befehl');
-        embed.addField('Entferne mehrere Nachrichten gleichzeitig mit dem Purge befehl', '/purge');
-        embed.addField('Editiere die verschiedenen Channels für Willkommensnachricht, etc. die Mod Rollen, sowie die Willkommensnachricht', '/setup')
+        const embed = new EmbedBuilder()
+            .setTitle("Was du ausprobieren kannst")
+            .setDescription('Alle Befehle kommen mit multiplen optionalen und benötigten Parametern, welche die Effekte beeinflussen.')
+            .addFields(
+                { name: 'Schau dir alle Befehle an', value: '/help' },
+                { name: 'Sende eine Nachricht über den Bot', value: '/send-message' },
+                { name: 'Editiere Nachrichten vom Bot', value: '/edit-message' },
+                { name: 'Schaue dir die Rollen an, die du automatisch bekommst', value: 'Im Voice, in der Faultierhalle, bei Aktivität' },
+                { name: 'Erstelle eine Nachricht, die im Intervall gesendet wird', value: '/add-automatic-message' },
+                { name: 'Bearbeite oder schaue alle aktiven automatischen Nachrichten an', value: '/show-automatic-messages, /edit-automatic-message' },
+                { name: 'Entferne nicht mehr gebrauchte automatische Nachrichten', value: '/remove-automatic-message' },
+                { name: 'Schreibe dem Bot eine private Nachricht, um den Wunschbrunnen zu erkunden', value: 'Und antworte auf die Nachricht mit /reply-to-message' },
+                { name: 'Entferne mehrere Nachrichten gleichzeitig', value: '/purge' },
+                { name: 'Editiere die Channels für Willkommensnachricht etc., Mod Rollen und die Willkommensnachricht', value: '/setup' },
+                { name: 'Reagiere mit einem Modemote ohne Mod Rolle', value: 'Global Mod, Sektions Mod, etc.' }
+            );
 
-        embed.addField('Versuche auf eine Nachricht mit einem Modemote zu reagieren, ohne eine Mod Rolle zu haben', 'Global Mod, Sektions Mod, etc..')
-        interaction.reply({embeds: [embed]});
+        await interaction.reply({ embeds: [embed] });
     },
 };

@@ -1,47 +1,70 @@
 const fetch = require('node-fetch');
 
-module.exports = class BadDomainChecker { 
-
-
-
+class BadDomainChecker {
     constructor(client) {
-        this.client = client; 
+        this.client = client;
 
-        this.BAD_HASHES_URL = "https://cdn.discordapp.com/bad-domains/hashes.json";
+        // Quellen
         this.BAD_LINKS_TXT_URL = "https://raw.githubusercontent.com/45i/Frequent-Scams/Main/Malicious%20Websites/raw-links.txt";
         this.BAD_PHRASES_URL = "https://raw.githubusercontent.com/AerGameChannel/AntiScam-Bot/master/filter.json";
         this.BAD_DOMAINS_URL = "https://bad-domains.walshy.dev/domains.json";
 
-        this.BONUS_LIST = ["Free distribution of discord nitro", "https://discord.gg/"]
+        // Extra
+        this.BONUS_LIST = [
+            "Free distribution of discord nitro",
+            "https://discord.gg/"
+        ];
+
+        // Caches
+        this.links = [];
+        this.phrases = [];
+        this.domains = [];
     }
 
     async init() {
-        const links = await fetch(this.BAD_LINKS_TXT_URL);
-        const phrases = await fetch(this.BAD_PHRASES_URL);
-        const domains = await fetch(this.BAD_DOMAINS_URL);
-        
-        this.links = (await links.text()).split("\n");
-        this.phrases = await phrases.json();
-        this.domains = await domains.json();
+        try {
+            // Links (als Zeilenarray)
+            const linksRes = await fetch(this.BAD_LINKS_TXT_URL);
+            this.links = (await linksRes.text()).split("\n").filter(Boolean);
+
+            // Phrasen
+            const phrasesRes = await fetch(this.BAD_PHRASES_URL);
+            this.phrases = await phrasesRes.json();
+
+            // Domains
+            const domainsRes = await fetch(this.BAD_DOMAINS_URL);
+            this.domains = await domainsRes.json();
+        } catch (err) {
+            console.error("[BadDomainChecker] Fehler beim Laden der Blacklists:", err);
+        }
     }
 
     stringHasURL(str) {
-        var expression = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/i
-
-        var regex = new RegExp(expression);
-        if (regex.test(str)) {
-            return regex.exec(str)[2];
-        }
-
-        return null;
+        // Findet die erste URL im String, gibt sie zurück (inklusive Subdomains)
+        const urlRegex = /(?:https?:\/\/)?(?:www\.)?([\w\-_]+\.[\w\.\-_]+)(\/\S*)?/i;
+        const match = urlRegex.exec(str);
+        return match ? match[1].toLowerCase() : null;
     }
 
-    isBadURL(str) {
-        return this.links.includes(str) || this.domains.includes(str)
+    isBadURL(url) {
+        if (!url) return false;
+        // Testet gegen bekannte böse URLs und Domains (nur Domainpart)
+        url = url.toLowerCase().replace(/^www\./, "");
+        return (
+            this.links.some(link => url.includes(link.toLowerCase())) ||
+            this.domains.some(domain => url === domain.toLowerCase() || url.endsWith("." + domain.toLowerCase()))
+        );
     }
 
     stringHasBadPhrase(str) {
-        return this.phrases.some(v => str.includes(v)) || this.BONUS_LIST.some(v => str.includes(v))  || this.client.phrases.some(v => str.includes(v)) 
+        if (!str) return false;
+        str = str.toLowerCase();
+        return (
+            this.phrases.some(v => str.includes(v.toLowerCase())) ||
+            this.BONUS_LIST.some(v => str.includes(v.toLowerCase())) ||
+            (this.client.phrases?.some(v => str.includes(v.toLowerCase())) ?? false)
+        );
     }
-
 }
+
+module.exports = BadDomainChecker;

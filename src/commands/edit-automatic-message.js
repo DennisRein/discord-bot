@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageSelectMenu, Constants } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,41 +8,48 @@ module.exports = {
             option
                 .setName('id')
                 .setRequired(true)
-                .setDescription('Die ID der zu entfernenden Nachricht: /show-automatic-messages')),
+                .setDescription('Die ID der zu bearbeitenden Nachricht: /show-automatic-messages')),
     async execute(interaction) {
-        if(!interaction.client.memberHasPermission(interaction.member)) {
-			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
-			return; 
-		}
-        if(!interaction.client.configExists()) {
-			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
-			return; 
-		}
-        let id = interaction.options.get("id").value;
-
-        let botMessage = "Antworte bitte auf diese Nachricht mit der veränderten Nachricht die du senden willst, du hast eine Minute Zeit: ";
-		await interaction.reply({ content: botMessage, fetchReply: true }).then(message => {
-  
-            const SECONDS_TO_REPLY = 60 // replace 60 with how long to wait for message(in seconds).
-            const MESSAGES_TO_COLLECT = 1
-            const filter = (m) => m.author.id == interaction.user.id
-            const collector = interaction.channel.createMessageCollector({filter, time: SECONDS_TO_REPLY * 1000, max: MESSAGES_TO_COLLECT})
-            collector.on('end', collected => {
-                if (collected.size <= 0) {
-                    interaction.deleteReply();
-                    
-                }
+        if (!interaction.client.memberHasPermission(interaction.member)) {
+            await interaction.reply({
+                content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.',
+                flags: 64 // Ephemeral
             });
-            collector.on('collect', async (collected) => {
-                const affectedRows = await interaction.client.db.autoMessageModel.update({ message: collected.content }, { where: { id: id } });
+            return;
+        }
+        if (!interaction.client.configExists()) {
+            await interaction.reply({
+                content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!',
+                flags: 64 // Ephemeral
+            });
+            return;
+        }
+        const id = interaction.options.getInteger("id");
 
-                if (affectedRows > 0) {
-                    return interaction.followUp(`Nachricht ${id} wurde erfolgreich editiert.`);
-                }
+        const botMessage = "Antworte bitte auf diese Nachricht mit der veränderten Nachricht, die du senden willst. Du hast eine Minute Zeit:";
+        await interaction.reply({ content: botMessage });
 
-                return interaction.followUp(`Ich konnte keine Nachricht mit der gegebenen ID finden.`);
-            })
+        const filter = m => m.author.id === interaction.user.id;
+        const collector = interaction.channel.createMessageCollector({ filter, time: 60_000, max: 1 });
+
+        collector.on('end', async collected => {
+            if (collected.size === 0) {
+                // Antwort wurde nicht gegeben -> Reply löschen
+                try { await interaction.deleteReply(); } catch { }
+            }
         });
 
+        collector.on('collect', async collected => {
+            const affectedRows = await interaction.client.db.autoMessageModel.update(
+                { message: collected.content },
+                { where: { id: id } }
+            );
+
+            if (affectedRows[0] > 0) {
+                await interaction.followUp(`Nachricht mit der ID ${id} wurde erfolgreich editiert.`);
+            } else {
+                await interaction.followUp(`Ich konnte keine Nachricht mit der gegebenen ID finden.`);
+            }
+        });
     },
 };

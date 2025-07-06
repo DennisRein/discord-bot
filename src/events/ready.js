@@ -1,146 +1,110 @@
-
+const { EmbedBuilder } = require('discord.js');
+const schedule = require('node-schedule');
+const moment = require('moment');
 
 module.exports = {
-	name: 'ready',
-	once: false,
-	async execute(client) {
-		console.log(`Ready! Logged in as ${client.user.tag}`);
+    name: 'ready',
+    once: false,
+    async execute(client) {
+        console.log(`Ready! Logged in as ${client.user.tag}`);
 
-		console.log("Loading Bad Domains");
-		await client.badDomainChecker.init();
+        // Lade Bad Domains (async)
+        console.log("Loading Bad Domains");
+        await client.badDomainChecker.init();
 
-		client.db.sync();
-	
-		//client.user.setActivity('melde dich hier anonym',{type: "PLAYING"});
+        // Datenbank sync
+        await client.db.sync();
 
-		if(!client.configExists()) {
-			return; 
-		}
-		const { guildId, purgeInterval } = client.config;
+        if (!client.configExists()) {
+            console.log("Keine Konfiguration gefunden, Bot wartet auf /setup.");
+            return;
+        }
 
-		client.interval = startInterval(client);
-		const writeLogMessage = require("../utils/writeLogMessage.js");
+        const { guildId, purgeInterval } = client.config;
+        client.interval = startInterval(client);
 
-		var schedule = require('node-schedule');
-
-		let schedName = 'midnight';
-
-		schedule.scheduleJob(schedName, '0 0 0 * * *', async () => {
-			var moment = require('moment'); // require
-
-
-			const list = await client.guilds.fetch(guildId);
-			let member = await list.members.fetch();
-			let count = 0;
-			for (let m of member) {
-				m = m[1];
-				if (m.roles.cache.size <= 1) {
-					let joined = m.joinedTimestamp
-					var newDate = moment(Date.now()).add(`-${purgeInterval}`, 'days').toDate();
-					if (joined < newDate) {
-						//
-						if (m.kickable && count <= 100) {
-							console.log(m.user.username);
-							count++;
-							m.kick();
-						}
-					}
-				}
-			}
-			if (count > 0) {
-				writeLogMessage({ client: client, type: "inactivePurge", args: count });
-			}
-		}) 
-	},
+        // Inaktive User jede Nacht entfernen
+        schedule.scheduleJob('midnight', '0 0 0 * * *', async () => {
+            try {
+                const guild = await client.guilds.fetch(guildId);
+                const members = await guild.members.fetch();
+                let count = 0;
+                for (const [, member] of members) {
+                    // Members ohne echte Rolle und länger als purgeInterval dabei → kicken (max 100/Nacht)
+                    if (member.roles.cache.size <= 1) {
+                        const joined = member.joinedTimestamp;
+                        const cutoff = moment().subtract(purgeInterval, 'days').valueOf();
+                        if (joined < cutoff && member.kickable && count < 100) {
+                            console.log(`Kick: ${member.user.tag}`);
+                            await member.kick("Inactive, no roles");
+                            count++;
+                        }
+                    }
+                }
+                if (count > 0) {
+                    const writeLogMessage = require("../utils/writeLogMessage.js");
+                    writeLogMessage({ client, type: "inactivePurge", args: count });
+                }
+            } catch (err) {
+                console.error("Error during nightly purge:", err);
+            }
+        });
+    },
 };
 
+// === Automatischer Intervall-Runner für Twitch & Auto-Messages ===
 async function startInterval(client) {
-	var moment = require('moment'); // require
-	const { MessageEmbed } = require('discord.js');
+    const { guildId, twitchNotificationChannel, twitchLiveMessage } = client.config;
+    let guild = await client.guilds.fetch(guildId);
+    let channel = await guild.channels.fetch(twitchNotificationChannel);
+    let liveFlag = false;
 
-	const { guildId, twitchNotificationChannel, twitchLiveMessage } = client.config;
-	let guild = await client.guilds.fetch(guildId); 
-	let channel = await guild.channels.fetch(twitchNotificationChannel);
-	let liveFlag = false;
+    return setInterval(async () => {
+        // Twitch-Live-Benachrichtigung
+        if (client.twitch) {
+            try {
+                const stream = await client.twitch.isStreamLive("honeyball");
+                if (!liveFlag && stream) {
+                    liveFlag = true;
+                    const url = "https://twitch.tv/honeyball";
+                    const twitchEmbed = new EmbedBuilder()
+                        .setColor('#0099ff')
+                        .setTitle(stream.title)
+                        .setURL(url)
+                        .setAuthor({ name: stream.displayName, iconURL: stream.profilePic, url })
+                        .addFields(
+                            { name: 'Game', value: `${stream.gameName}`, inline: true },
+                            { name: 'Viewers', value: `${stream.viewers}`, inline: true }
+                        )
+                        .setImage(stream.thumbnail)
+                        .setTimestamp();
+                    await channel.send({ content: twitchLiveMessage, embeds: [twitchEmbed] });
+                } else if (liveFlag && !stream) {
+                    liveFlag = false;
+                }
+            } catch (e) {
+                console.error("Twitch-Notification-Fehler:", e);
+            }
+        }
 
-	return interval = setInterval(async function () {
-		if(client.twitch) {
-			client.twitch.isStreamLive("honeyball").then(stream => {
-				if(!liveFlag && stream) {
-					liveFlag = true;
-					let url = "https://twitch.tv/honeyball"
-					const twitchEmbed = new MessageEmbed()
-					.setColor('#0099ff')
-					.setTitle(stream.title)
-					.setURL(url)
-					.setAuthor({ name: stream.displayName, iconURL: stream.profilePic, url: url })
-					.addFields(
-						{ name: 'Game', value: `${stream.gameName}`, inline: true },
-						{ name: 'Viewers', value: `${stream.viewers}`, inline: true },
-					)
-					.setImage(stream.thumbnail)
-					.setTimestamp()		
-					channel.send({ content: twitchLiveMessage, embeds: [twitchEmbed] });
-				}
-				else if(liveFlag && !stream) {
-					liveFlag = false;
-				}
-			});
-		}
-		
-		
-
-		client.db.autoMessageModel.findAll().then((messageList) => {
-			for (let message of messageList) {
-				let msg = message.dataValues;
-				let now = Date.now();
-				let interval = msg.interval;
-				let lastSend = msg.lastsend;
-				var newDate = moment(lastSend).add(interval, 'm').toDate();
-				if (now >= newDate) {
-					let channel = client.channels.cache.get(msg.channel);
-					client.db.autoMessageModel.update({ lastsend: now }, { where: { id: msg.id } });
-
-					let embed = new MessageEmbed();
-					embed.title = msg.title;
-					embed.description = msg.message;
-					channel.send({embeds: [embed]});
-				}
-			}
-		})
-		client.db.timedRolesModel.findAll().then(async (entries) => {
-			for (let entry of entries) {
-				try {
-					
-					let e = entry.dataValues;
-					let now = Date.now();
-					let roleid = e.roleid;
-					let messageid = e.messageid;
-					let userid = e.userid;
-					let channelid = e.channelid;
-					let reaction = e.reactionid;
-
-					let guild = await client.guilds.fetch(guildId)
-					let member = await guild.members.fetch(userid);
-					let channel = await guild.channels.fetch(channelid);
-					let message = await channel.messages.fetch(messageid);
-					
-					if (now >= e.loseroleafter && e.userid && e.userid !== client.user.id) {
-						console.log("Removed user from grumpycat role: ", e.userid)
-						console.log("Bot id: ", client.user.id)
-						message.reactions.resolve(reaction).users.remove(userid);
-						member.roles.remove(roleid);
-						client.db.timedRolesModel.destroy({ where: { userid: userid } });	
-					}
-				}
-			catch(exception) {
-				let e = entry.dataValues;
-				let userid = e.userid;
-				client.db.timedRolesModel.destroy({ where: { userid: userid } });	
-
-				console.error("Problem with entry: ", entry);
-			}
-			}
-		})
-	}, 60 * 1000);
+        // Automatische Nachrichten (AutoMessage-Feature)
+        try {
+            const messageList = await client.db.autoMessageModel.findAll();
+            for (const message of messageList) {
+                const msg = message.dataValues;
+                const now = Date.now();
+                const nextSend = moment(msg.lastsend).add(msg.interval, 'minutes').valueOf();
+                if (now >= nextSend) {
+                    let targetChannel = client.channels.cache.get(msg.channel);
+                    await client.db.autoMessageModel.update({ lastsend: now }, { where: { id: msg.id } });
+                    const embed = new EmbedBuilder()
+                        .setTitle(msg.title)
+                        .setDescription(msg.message);
+                    await targetChannel.send({ embeds: [embed] });
+                }
+            }
+        } catch (e) {
+            console.error("Automessage-Interval-Fehler:", e);
+        }
+    }, 60 * 1000);
 }

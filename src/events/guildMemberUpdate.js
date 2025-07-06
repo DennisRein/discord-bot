@@ -1,42 +1,80 @@
 module.exports = {
-	name: 'guildMemberUpdate',
-	async execute(client, oldMember, newMember) {
-        const writeLogMessage = require("../utils/writeLogMessage.js");
-        if(!client.configExists()) {
-            console.log('Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!');	
-            return; 
+    name: 'guildMemberUpdate',
+    async execute(client, oldMember, newMember) {
+        if (!client.configExists()) {
+            console.log('Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!');
+            return;
         }
-        const entry = await newMember.guild.fetchAuditLogs().then(audit => audit.entries.first())
+        const writeLogMessage = require("../utils/writeLogMessage.js");
 
-        if((entry.target && oldMember.user) && entry.target.id !== oldMember.user.id) return;
-
-        if(entry.actionType === 'UPDATE' && entry.changes[0].key === 'communication_disabled_until' && entry.target.id === oldMember.user.id) {
-            writeLogMessage({ client: client, type: "userTimeouted", args: newMember, entry })
-
+        let entry;
+        try {
+            // Hol die letzten Auditlogs für Member-Updates (type 24)
+            const auditLogs = await newMember.guild.fetchAuditLogs({
+                limit: 5,
+                type: 24 // MEMBER_UPDATE
+            });
+            entry = auditLogs.entries.find(e =>
+                e.target.id === oldMember.id &&
+                Date.now() - e.createdTimestamp < 10 * 1000 // Nur sehr frische Auditlogs
+            );
+        } catch (e) {
+            console.warn("Auditlog-Fehler bei guildMemberUpdate:", e);
             return;
         }
 
-        if(oldMember.nickname !== newMember.nickname && entry.changes && entry.changes[0] && entry.changes[0].key === 'nick') return writeLogMessage({client: client, type: "nicknameChanged", args: oldMember, newMember});
-        
-        if(entry.action === "MEMBER_ROLE_UPDATE" )
-        {
-            if(entry.changes[0].key === "$add") {
+        // Timeout gesetzt
+        if (
+            entry &&
+            entry.action === "MEMBER_UPDATE" &&
+            entry.changes &&
+            entry.changes.some(c => c.key === "communication_disabled_until" && c.new)
+        ) {
+            writeLogMessage({ client, type: "userTimeouted", args: newMember, entry });
+            return;
+        }
+        // Timeout entfernt
+        if (
+            entry &&
+            entry.action === "MEMBER_UPDATE" &&
+            entry.changes &&
+            entry.changes.some(c => c.key === "communication_disabled_until" && c.old)
+        ) {
+            writeLogMessage({ client, type: "userUntimeouted", args: newMember, entry });
+            return;
+        }
 
-                roles = entry.changes[0].new;
-                let str = "";
-                for(let i in entry.changes[0].new) {
-                    str = i.name + " ";
+        // Nickname geändert
+        if (oldMember.nickname !== newMember.nickname) {
+            writeLogMessage({ client, type: "nicknameChanged", args: oldMember, newMember, entry });
+            return;
+        }
+
+        // Rollen hinzugefügt/entfernt (type 25 in v14+)
+        try {
+            const auditLogsRole = await newMember.guild.fetchAuditLogs({
+                limit: 5,
+                type: 25 // MEMBER_ROLE_UPDATE
+            });
+            const roleEntry = auditLogsRole.entries.find(e =>
+                e.target.id === oldMember.id &&
+                Date.now() - e.createdTimestamp < 10 * 1000
+            );
+
+            if (roleEntry) {
+                const changes = roleEntry.changes || [];
+                const added = changes.find(c => c.key === "$add");
+                const removed = changes.find(c => c.key === "$remove");
+
+                if (added && added.new) {
+                    writeLogMessage({ client, type: "roleAdded", args: added.new, member: newMember, entry: roleEntry });
                 }
-                writeLogMessage({ client: client, type: "guildMemberUpdate", args: true, roles, newMember });
-            }
-            if(entry.changes[0].key === "$remove") {
-                roles = entry.changes[0].new;
-                let str = "";
-                for(let i in entry.changes[0].new) {
-                    str = i.name + " ";
+                if (removed && removed.new) {
+                    writeLogMessage({ client, type: "roleRemoved", args: removed.new, member: newMember, entry: roleEntry });
                 }
-                writeLogMessage({ client: client, type: "guildMemberUpdate", args: false, roles, newMember });
             }
+        } catch (e) {
+            // Wenn Role-Auditlogs fehlschlagen, ignoriere still
         }
     },
 };

@@ -1,17 +1,17 @@
-const { SlashCommandBuilder, ChannelType } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton, Constants } = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('purge')
-        .setDescription('Entferne eine Anzahl Nachrichten direkt. ')
-        .addChannelOption(channel => {
-            return channel // Add return here
+        .setDescription('Entferne eine Anzahl Nachrichten direkt.')
+        .addChannelOption(channel =>
+            channel
                 .setName("channel")
                 .setDescription("In welchen Kanal möchtest du die Nachrichten entfernen?")
                 .setRequired(false)
-                .addChannelType(Constants.ChannelTypes.GUILD_TEXT)
-        })
+                .addChannelTypes(ChannelType.GuildText)
+        )
         .addUserOption(option =>
             option
                 .setName('user')
@@ -21,123 +21,84 @@ module.exports = {
         .addIntegerOption(option =>
             option
                 .setName('amount')
-                .setDescription('Anzahl an zu entfernenden Nachrichten. Leer lassen um ALLE betroffenen Nachrichten zu entfernen.')),
+                .setDescription('Anzahl an zu entfernenden Nachrichten. Leer lassen um ALLE betroffenen Nachrichten zu entfernen.')
+                .setRequired(false)
+        ),
     async execute(interaction) {
-        if(!interaction.client.memberHasPermission(interaction.member)) {
-			await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });	
-			return; 
-		}
-        if(!interaction.client.configExists()) {
-			await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });	
-			return; 
-		}
+        if (!interaction.client.memberHasPermission(interaction.member)) {
+            await interaction.reply({ content: 'Ich reagiere nur auf Befehle von Globulis, tut mir leid.', ephemeral: true });
+            return;
+        }
+        if (!interaction.client.configExists()) {
+            await interaction.reply({ content: 'Es existiert noch keine Config, bitte benutze den /setup Befehl um mich zu initialisieren!', ephemeral: true });
+            return;
+        }
         const writeLogMessage = require("../utils/writeLogMessage.js");
-        const channelID = interaction.options.get("channel") ?? null;
-        const userID = interaction.options.get("user") ?? null;
+        const channel = interaction.options.getChannel("channel") ?? null;
+        const user = interaction.options.getUser("user") ?? null;
+        let amount = interaction.options.getInteger("amount");
+        if (amount === null || amount === undefined) amount = -1;
 
-        let amount = interaction.options.get("amount") ?? null;
-        let a;
-        if (amount) a = amount.value;
-        else {
-            a = -1;
+        if (!channel && !user) {
+            await interaction.reply({ content: "Gebe zumindest entweder den User oder den Channel an." });
+            return;
         }
 
-        let user;
-        let channel;
-
-        if (!channelID && !userID) {
-            interaction.reply({ content: "Gebe zumindest entweder den User oder den Channel an." })
-        }
-
-        if (channelID) {
-            channel = await interaction.client.channels.fetch(channelID.value);
-        }
-
-        if (userID) {
-            user = await interaction.guild.members.cache.get(userID.value);
-        }
         let messageIDs = [];
 
         if (channel && user) {
             let messages = await channel.messages.fetch();
-
             messages = messages.filter(m => m.author.id === user.id);
 
-
-            if (a < 0) {
-                for (let message of messages) {
-                    messageIDs.push(message[0]);
-                }
+            if (amount < 0) {
+                messageIDs = [...messages.keys()];
+            } else {
+                messageIDs = [...messages.keys()].slice(0, amount);
             }
-            else {
-
-                let i = 0;
-                if (a > messages.size) a = messages.size;
-                for (let message of messages) {
-                    messageIDs.push(message[0]);
-                    i++;
-                    if (i == a) break;
-                }
-            }
-
         }
         else if (channel) {
             let messages = await channel.messages.fetch();
 
-            if (a < 0) {
-                for (let message of messages) {
-                    messageIDs.push(message[0]);
-                }
-            }
-            else {
-
-                let i = 0;
-                if (a > messages.size) a = messages.size;
-                for (let message of messages) {
-                    messageIDs.push(message[0]);
-                    i++;
-                    if (i == a) break;
-                }
+            if (amount < 0) {
+                messageIDs = [...messages.keys()];
+            } else {
+                messageIDs = [...messages.keys()].slice(0, amount);
             }
         }
-        else if(user) {
-
-            interaction.reply("Nur User wird noch nichts supportet.");
+        else if (user) {
+            await interaction.reply("Nur User wird noch nicht supportet.");
             return;
         }
+
         let buttons = getButtons();
-        interaction.reply({ content: `Sollen wirklich ${messageIDs.length} Nachrichten gelöscht werden?`, components: [buttons], fetchReply: true }).then(msg2 => {
-            const collector = msg2.channel.createMessageComponentCollector({ time: 15000 });
+        await interaction.reply({ content: `Sollen wirklich ${messageIDs.length} Nachrichten gelöscht werden?`, components: [buttons], fetchReply: true });
 
-            collector.on('collect', async i => {
-                if (i.customId === 'submit') {
-                    writeLogMessage({client: interaction.client, type: "purge", args: user, channel, messageIDs, interaction})
-                    channel.bulkDelete(messageIDs);
-                    await i.update({ content: `Es wurden ${messageIDs.length} Nachrichten gelöscht.`, components: [] });
-                        
-                }
-                if (i.customId === 'abort') {
-                    interaction.deleteReply();
-                }
-            });
-        })
+        const msg2 = await interaction.fetchReply();
+        const collector = msg2.createMessageComponentCollector({ time: 15000 });
 
+        collector.on('collect', async i => {
+            if (i.customId === 'submit') {
+                writeLogMessage({ client: interaction.client, type: "purge", args: user, channel, messageIDs, interaction });
+                await channel.bulkDelete(messageIDs);
+                await i.update({ content: `Es wurden ${messageIDs.length} Nachrichten gelöscht.`, components: [] });
+            }
+            if (i.customId === 'abort') {
+                await interaction.deleteReply();
+            }
+        });
     },
 };
 
 function getButtons() {
-	const row = new MessageActionRow().addComponents(
-		new MessageButton()
-			.setCustomId('submit')
-			.setLabel('Passt')
-			.setStyle('PRIMARY'),
-	)
-		.addComponents(
-			new MessageButton()
-				.setCustomId('abort')
-				.setLabel('Abbruch')
-				.setStyle('DANGER'),
-		);
-
-	return row;
+    const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId('submit')
+            .setLabel('Passt')
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId('abort')
+            .setLabel('Abbruch')
+            .setStyle(ButtonStyle.Danger),
+    );
+    return row;
 }
